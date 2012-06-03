@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +10,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Windows.Media.Imaging;
 
 namespace Konz.MyMovies.Core
 {
@@ -59,5 +62,36 @@ namespace Konz.MyMovies.Core
         /// Other Information
         /// </summary>
         public IDictionary<string, string> PropertyBag { get; set; }
+
+        public Movie()
+        {
+            Directors = new List<Artist>();
+            Writers = new List<Artist>();
+            Cast = new List<Artist>();
+            PropertyBag = new Dictionary<string, string>();
+            Shows = new List<Showtime>();
+        }
+
+        public List<Showtime> Shows { get; set; }
+
+        public string Showtimes
+        {
+            get
+            {
+                var result = (from s in Shows select s.Time.ToString("HH:mm")).ToArray();
+                return string.Join(", ", result);
+            }
+        }
+
+        BitmapImage _picture;
+        public BitmapImage PictureImg
+        {
+            get
+            {
+                if (_picture == null)
+                    _picture = new BitmapImage(new Uri(PictureURI));
+                return _picture;
+            }
+        }
     }
 }

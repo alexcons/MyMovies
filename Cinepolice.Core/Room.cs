@@ -15,29 +15,17 @@ namespace Konz.MyMovies.Core
         /// <summary>
         /// Sort Order
         /// </summary>
-        public int Order
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
+        public int Order{ get; set; }
 
         /// <summary>
         /// Room Features
         /// </summary>
-        public List<RoomFeature> Features
+        public List<RoomFeature> Features{ get; set; }
+
+        public Room()
         {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
+            Features = new List<RoomFeature>();
         }
+
     }
 }

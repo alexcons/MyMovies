@@ -7,12 +7,12 @@ using System.Resources;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Konz.MyMovies.UI")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("My Movies App")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Konz.MyMovies.UI")]
+[assembly: AssemblyCompany("Konz")]
+[assembly: AssemblyProduct("My Movies App")]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Konz")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

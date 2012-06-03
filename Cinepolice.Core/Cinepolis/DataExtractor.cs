@@ -17,22 +17,65 @@ namespace Konz.MyMovies.Core.Cinepolis
 {
     public class DataExtractor
     {
-        public string FilePath { get; set; }
-        Action<CinepolisData> OnComplete;
+        private string ShowsRootPath { get; set; }
+        private string CitiesRootPath { get; set; }
+        Action<List<Showtime>> OnCompleteShows;
+        Action<List<City>> OnCompleteCities;
         public DataExtractor()
         {
-            FilePath = @"http://www.cinepolis.com.mx/Cartelera/XMLCinepolis/{0}_{1}.xml";
+            ShowsRootPath = @"http://www.cinepolis.com.mx/Cartelera/XMLCinepolis/{0}_{1}.xml";
+            CitiesRootPath = @"http://www.cinepolis.com.mx/widget/aspx/ciudades.aspx";
         }
 
-        public void GetData(string cityCode, DateTime date, Action<CinepolisData> OnComplete)
+        public void GetCities(Action<List<City>> OnComplete)
         {
-            this.OnComplete = OnComplete;
+            this.OnCompleteCities = OnComplete;
             var wc = new WebClient();
-            wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(GetCinepolisFileComplete);
-            wc.DownloadStringAsync(new Uri(string.Format(FilePath, cityCode, date.ToString("yyyyMMdd"))), date);
+            wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(GetCinepolisCitiesComplete);            
+            wc.DownloadStringAsync(new Uri(CitiesRootPath));
         }
 
-        void GetCinepolisFileComplete(object sender, DownloadStringCompletedEventArgs e)
+        public void GetShows(string cityCode, DateTime date, Action<List<Showtime>> OnComplete)
+        {
+            this.OnCompleteShows = OnComplete;
+            var wc = new WebClient();
+            wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(GetCinepolisShowsComplete);
+            wc.DownloadStringAsync(new Uri(string.Format(ShowsRootPath, cityCode, date.ToString("yyyyMMdd"))), date);
+        }
+
+        void GetCinepolisCitiesComplete(object sender, DownloadStringCompletedEventArgs e)
+        {
+            var reader = XmlReader.Create(new StringReader(e.Result));
+            var cities = new List<City>();
+            while (reader.Read() && reader.Name != "ciudades" || reader.NodeType != XmlNodeType.EndElement)
+            {
+                if (reader.Name.Equals("ciudad"))
+                {
+                    var c = ReadCiudad(reader);
+                    cities.Add(c);
+                }
+            }
+
+            OnCompleteCities(cities);
+        }
+
+        private City ReadCiudad(XmlReader reader)
+        {
+            var c = new City();
+            string val;
+            if (GetAttribute(reader, "idPais", out val))
+                c.CountryCode = val;
+            while (reader.Read() && reader.Name != "ciudad" || reader.NodeType != XmlNodeType.EndElement)
+            {
+                if (GetValue(reader, "nombre", out val))
+                    c.Name = val;
+                if (GetValue(reader, "id", out val))
+                    c.Code = val;
+            }
+            return c;
+        }
+
+        void GetCinepolisShowsComplete(object sender, DownloadStringCompletedEventArgs e)
         {
             var reader = XmlReader.Create(new StringReader(e.Result));
             var data = new CinepolisData();
@@ -60,8 +103,8 @@ namespace Konz.MyMovies.Core.Cinepolis
                     data.Carteleras.Add(ReadCartelera(reader));
                 }
             }
-            
-            OnComplete(data);
+
+            OnCompleteShows(data.GetShowTimes());
 
         }
 
@@ -99,7 +142,7 @@ namespace Konz.MyMovies.Core.Cinepolis
                 {
                     string id, hr;
                     if (GetAttribute(reader, "idshowtime", out id) && GetAttribute(reader, "hr", out hr))
-                        s.Horarios.Add(id, hr);
+                        s.Horarios.Add(hr);
                 }
             }
             return s;
@@ -146,6 +189,8 @@ namespace Konz.MyMovies.Core.Cinepolis
             var p = new Pelicula();
             string val;
             if (GetAttribute(reader, "peliculaid", out val))
+                p.Code2 = val;
+            if (GetAttribute(reader, "peliculaidVista", out val))
                 p.Code = val;
             if (GetAttribute(reader, "nombre", out val))
                 p.Nombre = val;

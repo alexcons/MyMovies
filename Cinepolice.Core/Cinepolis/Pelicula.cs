@@ -20,5 +20,7 @@ namespace Konz.MyMovies.Core.Cinepolis
         public string Actores { get; set; }
 
         public string Calificacion { get; set; }
+
+        public string Code2 { get; set; }
     }
 }

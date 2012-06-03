@@ -7,15 +7,6 @@ namespace Konz.MyMovies.Core
 {
     public class RoomFeature : EntityBase
     {
-        public string PictureURI
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
+        public string PictureURI{ get; set; }
     }
 }

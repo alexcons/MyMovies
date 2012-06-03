@@ -25,16 +25,16 @@ namespace Konz.MyMovies.Core.Cinepolis
 
         public List<Cartelera> Carteleras { get; set; }
 
-        public List<Showtime> GetShowTimes(CinepolisData result)
+        public List<Showtime> GetShowTimes()
         {
             var movies = new List<Movie>();
             var city = new City()
             {
-                Code = result.Carteleras[0].CiudadCode,
-                Name = result.Carteleras[0].CiudadNombre
+                Code = Carteleras[0].CiudadCode,
+                Name = Carteleras[0].CiudadNombre
             };
             
-            foreach (var p in result.Peliculas)
+            foreach (var p in Peliculas)
             {
                 var m = new Movie()
                 {
@@ -44,14 +44,19 @@ namespace Konz.MyMovies.Core.Cinepolis
                     Sinopsis = p.Sinopsis
                 };
 
-                foreach (var a in p.Actores.Split(",".ToArray()))
+                if (p.Actores != null)
                 {
-                    m.Cast.Add(new Artist() {
-                        Name = a
-                    });
+                    foreach (var a in p.Actores.Split(",".ToArray()))
+                    {
+                        m.Cast.Add(new Artist()
+                        {
+                            Name = a
+                        });
+                    };
                 }
+                movies.Add(m);
             }
-            foreach (var c in result.Complejos)
+            foreach (var c in Complejos)
             {
                 var t = new Theater()
                 {
@@ -66,14 +71,14 @@ namespace Konz.MyMovies.Core.Cinepolis
                     {
                         Code = int.Parse(s.Code),
                         Name = s.Code,
-                        Order = int.Parse(s.Orden)
+                        Order = int.Parse(s.Orden??"0")
                     });
                 }
                 city.Theaters.Add(t);
             }
 
             var shows = new List<Showtime>();
-            foreach (var c in result.Carteleras)
+            foreach (var c in Carteleras)
             {
                 foreach (var s in c.Salas)
 	            {
@@ -82,11 +87,11 @@ namespace Konz.MyMovies.Core.Cinepolis
                         var st = new Showtime();
                         st.Theater = city.Theaters.Where(x => x.Code == c.ComplejoCode).SingleOrDefault();
                         st.Movie = movies.Where(x => x.Code == c.PeliculaCode).SingleOrDefault();
-                        st.Room = st.Theater.Rooms.Where(x => x.Code == int.Parse(s.Code)).SingleOrDefault();
-                        var timeParts = h.Value.Split(":".ToArray());
+                        foreach (var roomCode in s.Code.Split(",".ToArray()).ToArray())
+                            st.Rooms.Add(st.Theater.Rooms.Where(x => x.Code == int.Parse(roomCode)).SingleOrDefault());
+                        var timeParts = h.Split(":".ToArray());
                         var hr = int.Parse(timeParts[0]);
                         var mn = int.Parse(timeParts[1]);
-                        st.Code = h.Key;
                         st.Time = new DateTime(Fecha.Year, Fecha.Month, Fecha.Day, hr, mn, 00);
                         shows.Add(st);
                     }

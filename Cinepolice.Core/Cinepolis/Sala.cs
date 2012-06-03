@@ -9,11 +9,11 @@ namespace Konz.MyMovies.Core.Cinepolis
     {
         public SalaCartelera()
         {
-            Horarios = new Dictionary<string, string>();
+            Horarios = new List<string>();
         }
 
         public string Code { get; set; }
         
-        public Dictionary<string, string> Horarios { get; set; }
+        public List<string> Horarios { get; set; }
     }
 }
