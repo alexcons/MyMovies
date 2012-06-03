@@ -16,7 +16,7 @@ namespace Konz.MyMovies.Core
     {
         public static bool InternetIsAvailable()
         {
-            var available = !NetworkInterface.GetIsNetworkAvailable();
+            var available = NetworkInterface.GetIsNetworkAvailable();
 //#if DEBUG
 //            available = false;
 //#endif

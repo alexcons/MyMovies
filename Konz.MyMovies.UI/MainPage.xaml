@@ -35,7 +35,7 @@
             <RowDefinition Height="678*"/>
             <RowDefinition Height="90"/>
         </Grid.RowDefinitions>
-        <controls:Pivot Name="pvtTheaters" Title="Complejos" VerticalAlignment="Top" ItemsSource="{Binding}" SelectionChanged="pvtTheaters_SelectionChanged" >
+        <controls:Pivot Name="pvtTheaters" Title="Cargando..." VerticalAlignment="Top" ItemsSource="{Binding}" SelectionChanged="pvtTheaters_SelectionChanged" >
             <controls:Pivot.HeaderTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Foreground="{StaticResource PhoneAccentBrush}"></TextBlock>
