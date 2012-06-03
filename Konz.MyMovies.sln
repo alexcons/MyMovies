@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Konz.MyMovies.Core", "Cinepolice.Core\Konz.MyMovies.Core.csproj", "{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Konz.MyMovies.UI", "Konz.MyMovies.UI\Konz.MyMovies.UI.csproj", "{487DBA4F-A0AE-43C5-81F1-8975DBA5A08A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Konz.MyMovies.Core", "Konz.MyMovies.Core\Konz.MyMovies.Core.csproj", "{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,16 +15,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|x86.ActiveCfg = Release|Any CPU
 		{487DBA4F-A0AE-43C5-81F1-8975DBA5A08A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{487DBA4F-A0AE-43C5-81F1-8975DBA5A08A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{487DBA4F-A0AE-43C5-81F1-8975DBA5A08A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
@@ -39,6 +29,16 @@ Global
 		{487DBA4F-A0AE-43C5-81F1-8975DBA5A08A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{487DBA4F-A0AE-43C5-81F1-8975DBA5A08A}.Release|Mixed Platforms.Deploy.0 = Release|Any CPU
 		{487DBA4F-A0AE-43C5-81F1-8975DBA5A08A}.Release|x86.ActiveCfg = Release|Any CPU
+		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
