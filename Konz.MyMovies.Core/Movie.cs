@@ -93,5 +93,27 @@ namespace Konz.MyMovies.Core
                 return _picture;
             }
         }
+
+        public Showtime NextShow
+        {
+            get
+            {
+                Showtime result = null;
+                if (Shows.Count > 0)
+                    result = (from s in Shows orderby s.Time where s.Time > DateTime.Now select s).Take(1).SingleOrDefault();
+                return result??new Showtime() { Time = DateTime.MaxValue};
+            }
+        }
+
+        public string NextShowLegend
+        {
+            get 
+            {
+                if (NextShow.Time == DateTime.MaxValue)
+                    return "Hoy no hay mas funciones";
+                var mins = Math.Round(NextShow.Time.Subtract(DateTime.Now).TotalMinutes);
+                return "Empieza en " + mins.ToString() + " minutos";
+            }
+        }
     }
 }

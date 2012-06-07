@@ -51,13 +51,25 @@ namespace Konz.MyMovies.UI
         {
             if (e.AddedItems.Count > 0)
             {
-                var city = e.AddedItems[0] as City;
+                var newCity = e.AddedItems[0] as City;
+
                 var settings = IsolatedStorageSettings.ApplicationSettings;
-                if (settings.Contains("SelectedCity"))
-                    settings["SelectedCity"] = city;
-                else
-                    settings.Add("SelectedCity", city);
+                City oldCity = null;
+                if (settings.Contains("city"))
+                {
+                    oldCity = (City)settings["city"];
+                    settings.Remove("city");
+                }
+                settings.Add("city", newCity);
+
+                if (oldCity == null || newCity != oldCity)
+                {
+                    if (PhoneApplicationService.Current.State.ContainsKey("allshows"))
+                        PhoneApplicationService.Current.State.Remove("allshows");
+                }
+
                 settings.Save();
+
                 NavigationService.Navigate(new Uri("/MainPage.xaml", UriKind.Relative));
             }                
         }

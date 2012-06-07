@@ -7,7 +7,85 @@
 
     <!--Application Resources-->
     <Application.Resources>
-    </Application.Resources>
+		<ControlTemplate x:Key="PhoneSimpleRepeatButton" TargetType="RepeatButton">
+        <Rectangle Fill="Transparent"/>
+    </ControlTemplate>
+    <LinearGradientBrush x:Key="LowerTrackGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="Blue" Offset="0" />
+        <GradientStop Color="LightBlue" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="UpperTrackGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="Black" Offset="0" />
+        <GradientStop Color="LightGray" Offset="1" />
+    </LinearGradientBrush>
+    <Style x:Key="MySlider" TargetType="Slider">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Maximum" Value="10"/>
+        <Setter Property="Minimum" Value="0"/>
+        <Setter Property="Value" Value="0"/>
+        <Setter Property="Background" Value="{StaticResource PhoneContrastBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource PhoneAccentBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="MouseOver"/>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" To="0.1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="HorizontalTrack"/>
+                                        <DoubleAnimation Duration="0" To="0.1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="VerticalTrack"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Fill" Storyboard.TargetName="HorizontalFill">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PhoneDisabledBrush}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Fill" Storyboard.TargetName="VerticalFill">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PhoneDisabledBrush}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Ellipse Fill="{StaticResource LowerTrackGradient}" Width="10" HorizontalAlignment="Left" Height="10" Margin="20,0,0,0">
+                            <Ellipse.Clip>
+                                <RectangleGeometry Rect="0,0,5,10"/>
+                            </Ellipse.Clip>
+                        </Ellipse>
+                        <Ellipse Fill="{StaticResource UpperTrackGradient}" Width="10" HorizontalAlignment="Right" Height="10" Margin="0,0,20,0">
+                            <Ellipse.Clip>
+                                <RectangleGeometry Rect="5,0,5,10"/>
+                            </Ellipse.Clip>
+                        </Ellipse>
+                        <Grid x:Name="HorizontalTemplate" Margin="25,0,25,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="46"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Rectangle x:Name="HorizontalFill" Fill="{StaticResource LowerTrackGradient}" Grid.Column="0" Height="10" IsHitTestVisible="False">
+                            </Rectangle>
+                            <Rectangle Fill="{StaticResource UpperTrackGradient}" x:Name="HorizontalTrack" Grid.Column="2" Height="10" IsHitTestVisible="False">
+                            </Rectangle>
+                                <RepeatButton x:Name="HorizontalTrackLargeChangeDecreaseRepeatButton"  Grid.Column="0" IsTabStop="False" Template="{StaticResource PhoneSimpleRepeatButton}"/>
+                            <RepeatButton x:Name="HorizontalTrackLargeChangeIncreaseRepeatButton" Grid.Column="2" IsTabStop="False" Template="{StaticResource PhoneSimpleRepeatButton}"/>
+                                <Thumb x:Name="HorizontalThumb" Grid.Column="1" Height="46" Width="92" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Thumb.Template>
+                                    <ControlTemplate>
+                                        <Canvas Background="Transparent" Height="46" Width="46">
+                                            <Image Source="thumb.png" Width="46" Height="46"/>
+                                        </Canvas>
+                                    </ControlTemplate>
+                                </Thumb.Template>
+                            </Thumb>
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+	            </Setter.Value>
+	        </Setter>
+	    </Style>
+	</Application.Resources>
 
     <Application.ApplicationLifetimeObjects>
         <!--Required object that handles lifetime events for the application-->
