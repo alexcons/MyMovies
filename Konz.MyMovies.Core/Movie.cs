@@ -12,21 +12,42 @@ using System.Windows.Shapes;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Media.Imaging;
+using System.Xml.Serialization;
 
 namespace Konz.MyMovies.Core
 {
     public class Movie : EntityBase
     {
+        BitmapImage _picture;
+
+        [XmlIgnore]
+        public BitmapImage PictureImg
+        {
+            get
+            {
+                if (_picture == null)
+                    _picture = new BitmapImage(new Uri(PictureURI));
+                return _picture;
+            }
+        }
 
         /// <summary>
         /// Movie Directors
         /// </summary>
+        [XmlIgnore]
         public List<Artist> Directors {get; set;}
 
         /// <summary>
         /// Movie Writers
         /// </summary>
+        [XmlIgnore]
         public List<Artist> Writers {get; set;}
+
+        /// <summary>
+        /// Main Cast Members
+        /// </summary>
+        [XmlIgnore]
+        public List<Artist> Cast { get; set; }
 
         /// <summary>
         /// Cinepolis Code
@@ -42,11 +63,6 @@ namespace Konz.MyMovies.Core
         /// Movie Plot
         /// </summary>
         public string Sinopsis {get; set;}
-
-        /// <summary>
-        /// Main Cast Members
-        /// </summary>
-        public List<Artist> Cast {get; set;}
 
         /// <summary>
         /// Movie Rating
@@ -72,28 +88,20 @@ namespace Konz.MyMovies.Core
             Shows = new List<Showtime>();
         }
 
+        [XmlIgnore]
         public List<Showtime> Shows { get; set; }
 
+        [XmlIgnore]
         public string Showtimes
         {
             get
             {
-                var result = (from s in Shows select s.Time.ToString("HH:mm")).ToArray();
+                var result = (from s in Shows select s.Time.ToString("h:mmtt")).ToArray();
                 return string.Join(", ", result);
             }
         }
 
-        BitmapImage _picture;
-        public BitmapImage PictureImg
-        {
-            get
-            {
-                if (_picture == null)
-                    _picture = new BitmapImage(new Uri(PictureURI));
-                return _picture;
-            }
-        }
-
+        [XmlIgnore]
         public Showtime NextShow
         {
             get
@@ -105,6 +113,7 @@ namespace Konz.MyMovies.Core
             }
         }
 
+        [XmlIgnore]
         public string NextShowLegend
         {
             get 

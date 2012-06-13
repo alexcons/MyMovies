@@ -12,6 +12,7 @@ using System.Windows.Shapes;
 using System.Xml;
 using System.Collections.Generic;
 using Konz.MyMovies.Core;
+using System.Globalization;
 
 namespace Konz.MyMovies.Core.Cinepolis
 {
@@ -19,7 +20,7 @@ namespace Konz.MyMovies.Core.Cinepolis
     {
         private string ShowsRootPath { get; set; }
         private string CitiesRootPath { get; set; }
-        Action<List<Showtime>> OnCompleteShows;
+        Action<DateTime, List<Showtime>> OnCompleteShows;
         Action<List<City>> OnCompleteCities;
         public DataExtractor()
         {
@@ -35,7 +36,7 @@ namespace Konz.MyMovies.Core.Cinepolis
             wc.DownloadStringAsync(new Uri(CitiesRootPath));
         }
 
-        public void GetShows(string cityCode, DateTime date, Action<List<Showtime>> OnComplete)
+        public void GetShows(string cityCode, DateTime date, Action<DateTime, List<Showtime>> OnComplete)
         {
             this.OnCompleteShows = OnComplete;
             var wc = new WebClient();
@@ -104,7 +105,7 @@ namespace Konz.MyMovies.Core.Cinepolis
                 }
             }
 
-            OnCompleteShows(data.GetShowTimes());
+            OnCompleteShows(data.Vigencia.hasta.AddDays(1), data.GetShowTimes());
 
         }
 
@@ -215,17 +216,18 @@ namespace Konz.MyMovies.Core.Cinepolis
             var v = new Vigencia();
             while (reader.Read() && reader.Name != "vigencia" || reader.NodeType != XmlNodeType.EndElement)
             {
+                var culture = new CultureInfo("en-US");
                 if (reader.Name == "de" && reader.NodeType != XmlNodeType.EndElement)
-                    v.de = DateTime.Parse(reader.GetAttribute("fecha"));
+                    v.de = DateTime.ParseExact(reader.GetAttribute("fecha").Trim(), "MM/dd/yyyy", culture);
                 if (reader.Name == "hasta" && reader.NodeType != XmlNodeType.EndElement)
-                    v.hasta = DateTime.Parse(reader.GetAttribute("fecha"));
+                    v.hasta = DateTime.ParseExact(reader.GetAttribute("fecha").Trim(), "MM/dd/yyyy", culture);
             }
             return v;
         }
 
         private bool GetAttribute(XmlReader reader, string attributeName, out string result)
         {
-            result = reader.GetAttribute(attributeName);
+            result = reader.GetAttribute(attributeName).Trim();
             return !string.IsNullOrWhiteSpace(result);
         }
 
@@ -233,7 +235,7 @@ namespace Konz.MyMovies.Core.Cinepolis
         {
             result = string.Empty;
             if (reader.Name == elementName && reader.NodeType != XmlNodeType.EndElement)
-                result = reader.ReadElementContentAsString();
+                result = reader.ReadElementContentAsString().Trim();
             return !string.IsNullOrWhiteSpace(result);
         }
 

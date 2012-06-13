@@ -8,7 +8,7 @@ namespace Konz.MyMovies.Core
     public class Room : EntityBase
     {
         /// <summary>
-        /// Cinepolis Room Number
+        /// Room Code
         /// </summary>
         public int Code { get; set; }
 

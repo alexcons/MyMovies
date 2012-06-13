@@ -14,11 +14,19 @@ using Konz.MyMovies.Core.Cinepolis;
 using Konz.MyMovies.Core;
 using Microsoft.Phone.Shell;
 using System.IO.IsolatedStorage;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace Konz.MyMovies.UI
 {
     public partial class MainPage : PhoneApplicationPage
     {
+        const string showsFileName = "shows.xml";
+        const string citySetting = "city";
+        const string cityDirty = "cityDirty";
+        const int expirationDays = 1;
+
+
         List<Showtime> _allShows;
 
         City _currentCity;
@@ -37,36 +45,20 @@ namespace Konz.MyMovies.UI
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            var settings = IsolatedStorageSettings.ApplicationSettings;
-            if (settings.Contains("city"))
-                _currentCity = (City)settings["city"];
-            else
-                _currentCity = new City() { Code = "12", Name = "Culiacán" };
+            _currentCity = (City) SettingsManager.LoadSetting(citySetting) ?? new City() { Code = "12", Name = "Culiacán" };
+            _currentTheaterCode = (string)SettingsManager.LoadSetting("theater");
+            _currentDate = DateTime.Today;
+            var isCityDirty = (bool?)SettingsManager.LoadSetting(cityDirty) ?? true;
 
-            if (settings.Contains("date"))
-                _currentDate = (DateTime)settings["date"];
-            else
-                _currentDate = DateTime.Today;
-            
-            if (settings.Contains("theater"))
-                _currentTheaterCode = (string)settings["theater"];
-            else
-                _currentTheaterCode = null;
 
-            if (PhoneApplicationService.Current.State.ContainsKey("allshows"))
-                _allShows = (List<Showtime>)PhoneApplicationService.Current.State["allshows"];
+            if (PhoneApplicationService.Current.State.ContainsKey("allshows") && !isCityDirty)
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(CityData));
+                var showsString = (string)PhoneApplicationService.Current.State["allshows"];
+                var sr = new StringReader(showsString);
+                _allShows = ((CityData)serializer.Deserialize(sr)).GetShows();
+            }
 
-            base.OnNavigatedTo(e);
-        }
-
-        protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
-        {
-            PhoneApplicationService.Current.State["allshows"] = _allShows;
-            base.OnNavigatedFrom(e);
-        }
-
-        private void LayoutRoot_Loaded(object sender, RoutedEventArgs e)
-        {
             while (NavigationService.CanGoBack)
                 NavigationService.RemoveBackEntry();
 
@@ -76,33 +68,88 @@ namespace Konz.MyMovies.UI
                 sldFromTime.Value = 0;
 
             if (_allShows != null)
-            {
-                LoadData(_allShows);
-                return;
-            }
+                ShowData(_allShows);
+            else
+                PersistableFile<CityData>.Load(showsFileName, new Action<PersistableFile<CityData>, Exception>(ShowsLoadedFromFile));
+            
+            base.OnNavigatedTo(e);
+        }
 
-            if (Utils.InternetIsAvailable())
-            {
-                var c = new DataExtractor();
-                c.GetShows(_currentCity.Code, _currentDate, new Action<List<Showtime>>(LoadData));
-            }
+        protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
+        {
+            StringWriter sr = new StringWriter();
+            XmlSerializer serializer = new XmlSerializer(typeof(CityData));
+            serializer.Serialize(sr, CityData.GetCityDataFromShows(_currentCity.Code, _allShows));
+            PhoneApplicationService.Current.State["allshows"] = sr.ToString();
+            sr.Close();
+            SettingsManager.SaveSetting(cityDirty, false);
+            base.OnNavigatedFrom(e);
+        }
+
+        private void ShowsLoadedFromFile(PersistableFile<CityData> file, Exception error)
+        {
+            if (error == null && file != null && file.ExpirationDate > DateTime.Now && file.Data.CityCode == _currentCity.Code)
+                ShowData(file.Data.GetShows());
             else
             {
-                NavigationService.GoBack();
+                LoadFromInternet();
             }
         }
 
-        private void LoadData(List<Showtime> result)
+        private void LoadFromInternet()
+        {
+            if (Utils.InternetIsAvailable())
+            {
+                var c = new DataExtractor();
+                c.GetShows(_currentCity.Code, _currentDate, new Action<DateTime, List<Showtime>>(ShowsLoadedFromInternet));
+            }
+            else
+            {
+                MessageBox.Show("No hay connexion a internet. Por favor intente mas tarde.");
+                //NavigationService.GoBack();
+            }
+        }
+
+        private void ShowsLoadedFromInternet(DateTime expiresOn, List<Showtime> result)
+        {
+            if (result == null)
+                MessageBox.Show("No pudimos conectarnos al servidor de cinépolis. Por favor intente mas tarde.");
+            else
+            {
+                var file = new PersistableFile<CityData>()
+                {
+                    CreationDate = DateTime.Now,
+                    ExpirationDate = expiresOn,
+                    FileName = showsFileName,
+                    Data = CityData.GetCityDataFromShows(_currentCity.Code, result)
+                };
+
+                file.Save(delegate(Exception ex)
+                {
+#if DEBUG
+                    if (ex != null)
+                        MessageBox.Show("El guardado del archivo local de funciones falló: " + ex.Message);
+#endif
+                });
+                ShowData(result);
+            }
+        }
+
+        private void ShowData(List<Showtime> result)
         {
             _allShows = result;
-            var allTheaters = _allShows.Select(x => x.Theater).Distinct().ToList();
-            if (_currentTheaterCode != null)
-                _currentTheater = allTheaters.Where(x => x.Code == _currentTheaterCode).SingleOrDefault() ?? allTheaters[0];
-            else
-                _currentTheater = allTheaters[0];
 
-            DataContext = allTheaters;
+            var theaters = _allShows.Select(x => x.Theater).Distinct().ToList();
+            
+            if (_currentTheaterCode != null)
+                _currentTheater = theaters.Where(x => x.Code == _currentTheaterCode).SingleOrDefault() ?? theaters[0];
+            else
+                _currentTheater = theaters[0];
+
+            DataContext = theaters;
             pvtTheaters.SelectedItem = _currentTheater;
+            
+            RefreshShows(result);
         }
 
         private void RefreshShows(List<Showtime> shows)
@@ -137,7 +184,7 @@ namespace Konz.MyMovies.UI
         {
             var time = _startTime.Add(TimeSpan.FromMinutes(sldFromTime.Value));
             var fromTime = _currentDate.Add(time);
-            txtTimeFrom.Text = fromTime.ToString("HH:mm");
+            txtTimeFrom.Text = fromTime.ToString("h:mmtt");
         }
 
         private void pvtTheaters_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -145,14 +192,7 @@ namespace Konz.MyMovies.UI
             if (e.AddedItems.Count > 0)
             {
                 _currentTheater = e.AddedItems[0] as Theater;
-                
-                var settings = IsolatedStorageSettings.ApplicationSettings;
-                if (!settings.Contains("theater"))
-                    settings.Add("theater", _currentTheater.Code);
-                else
-                    settings["theater"] = _currentTheater.Code;
-                settings.Save();
-
+                SettingsManager.SaveSetting("theater", _currentTheater.Code);
                 RefreshShows(_allShows);
             }
         }
@@ -190,6 +230,11 @@ namespace Konz.MyMovies.UI
         private void sldFromTime_ManipulationCompleted(object sender, ManipulationCompletedEventArgs e)
         {
             RefreshShows(_allShows);
+        }
+
+        private void MenuRefresh_Click(object sender, EventArgs e)
+        {
+            LoadFromInternet();
         }
     }
 }

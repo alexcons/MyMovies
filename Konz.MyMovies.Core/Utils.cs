@@ -16,16 +16,8 @@ namespace Konz.MyMovies.Core
     {
         public static bool InternetIsAvailable()
         {
-            var available = NetworkInterface.GetIsNetworkAvailable();
-//#if DEBUG
-//            available = false;
-//#endif
-            if (!available)
-            {
-                MessageBox.Show("No hay connexion a internet. Por favor intente mas tarde.");
-                return false;
-            }
-            return true;
+            //return false;
+            return NetworkInterface.GetIsNetworkAvailable();
         }
 
     }

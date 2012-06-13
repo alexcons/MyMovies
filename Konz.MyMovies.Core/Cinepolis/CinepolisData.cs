@@ -56,6 +56,7 @@ namespace Konz.MyMovies.Core.Cinepolis
                 }
                 movies.Add(m);
             }
+            var theaters = new List<Theater>();
             foreach (var c in Complejos)
             {
                 var t = new Theater()
@@ -74,7 +75,7 @@ namespace Konz.MyMovies.Core.Cinepolis
                         Order = int.Parse(s.Orden??"0")
                     });
                 }
-                city.Theaters.Add(t);
+                theaters.Add(t);
             }
 
             var shows = new List<Showtime>();
@@ -85,10 +86,8 @@ namespace Konz.MyMovies.Core.Cinepolis
                     foreach (var h in s.Horarios)
                     {
                         var st = new Showtime();
-                        st.Theater = city.Theaters.Where(x => x.Code == c.ComplejoCode).SingleOrDefault();
+                        st.Theater = theaters.Where(x => x.Code == c.ComplejoCode).SingleOrDefault();
                         st.Movie = movies.Where(x => x.Code == c.PeliculaCode).SingleOrDefault();
-                        foreach (var roomCode in s.Code.Split(",".ToArray()).ToArray())
-                            st.Rooms.Add(st.Theater.Rooms.Where(x => x.Code == int.Parse(roomCode)).SingleOrDefault());
                         var timeParts = h.Split(":".ToArray());
                         var hr = int.Parse(timeParts[0]);
                         var mn = int.Parse(timeParts[1]);

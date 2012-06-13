@@ -3,25 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using System.Xml.Serialization;
 
 namespace Konz.MyMovies.Core
 {
     public class Theater : EntityBase
     {
-        /// <summary>
-        /// Cinepolis Theater Code
-        /// </summary>
         public string Code{ get; set; }
 
-        /// <summary>
-        /// Sort Order
-        /// </summary>
         public int Order { get; set; }
 
-        /// <summary>
-        /// Theater Rooms
-        /// </summary>
+        [XmlIgnore]
         public List<Room> Rooms { get; set; }
+        
+        [XmlIgnore]
+        public ObservableCollection<Movie> Movies { get; set; }
 
         public Theater()
         {
@@ -29,6 +25,5 @@ namespace Konz.MyMovies.Core
             Movies = new ObservableCollection<Movie>();
         }
 
-        public ObservableCollection<Movie> Movies { get; set; }
     }
 }

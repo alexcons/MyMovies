@@ -19,12 +19,13 @@
             <shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="Cambiar de Ciudad" Click="MenuCityChange_Click"/>
                 <shell:ApplicationBarMenuItem Text="Cambiar de Complejo" Click="MenuComplexChange_Click"/>
+                <shell:ApplicationBarMenuItem Text="Refrescar" Click="MenuRefresh_Click"/>
             </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 
     <!--LayoutRoot is the root grid where all page content is placed-->
-    <Grid x:Name="LayoutRoot" Background="Transparent" Loaded="LayoutRoot_Loaded" >
+    <Grid x:Name="LayoutRoot" Background="Transparent" >
         <Grid.RowDefinitions>
             <RowDefinition Height="678*"/>
             <RowDefinition Height="90"/>
