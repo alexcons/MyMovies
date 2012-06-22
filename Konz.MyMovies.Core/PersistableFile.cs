@@ -18,8 +18,6 @@ namespace Konz.MyMovies.Core
     public class PersistableFile <T>
     {
         public string FileName { get; set; }
-        public DateTime CreationDate { get; set; }
-        public DateTime ExpirationDate { get; set; }
         public T Data { get; set; }
 
         public void Delete(Action<bool, Exception> OnDeleted)
@@ -93,7 +91,7 @@ namespace Konz.MyMovies.Core
                 using (var myIsolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
                 {
                     if (!myIsolatedStorage.FileExists(FileName))
-                        return;
+                        throw new System.IO.FileNotFoundException(string.Format("The file {0} was not found", FileName));
 
                     using (var stream = myIsolatedStorage.OpenFile(FileName, System.IO.FileMode.Open))
                     {

@@ -1,0 +1,55 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="Konz.MyMovies.UI.MovieDetail"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="PortraitOrLandscape"  Orientation="Portrait"
+    shell:SystemTray.IsVisible="False" OrientationChanged="PhoneApplicationPage_OrientationChanged">
+
+    <!--LayoutRoot contains the root grid where all other page content is placed-->
+    <Grid x:Name="LayoutRoot">
+        <controls:Panorama Name="panMovie" Title="[moviename]">
+
+            <!--Panorama item one-->
+            <controls:PanoramaItem Name="txtMovieTitle" Header="Pelicula">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>    
+                    </Grid.ColumnDefinitions>
+                    <Image Name="imgPoster" HorizontalAlignment="Left"/>
+                    <TextBlock Grid.Row="1" Name="txtSinopsis" TextWrapping="Wrap" Width="420" HorizontalAlignment="Left" />
+                </Grid>
+            </controls:PanoramaItem>
+            
+            <!--Panorama item three-->
+            <controls:PanoramaItem Header="Horarios">
+                <ListBox Name="lstShowtimes">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}" FontSize="{StaticResource PhoneFontSizeLarge}" Foreground="{StaticResource PhoneAccentBrush}" />
+                                <TextBlock Text="{Binding Movies[0].ShowtimesHours}" FontSize="{StaticResource PhoneFontSizeMedium}" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </controls:PanoramaItem>
+        </controls:Panorama>
+    </Grid>
+
+    <!--Panorama-based applications should not show an ApplicationBar-->
+
+</phone:PhoneApplicationPage>

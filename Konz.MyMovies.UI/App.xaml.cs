@@ -13,6 +13,7 @@ using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using System.Diagnostics;
+using System.IO.IsolatedStorage;
 
 namespace Konz.MyMovies.UI
 {
@@ -99,6 +100,12 @@ namespace Konz.MyMovies.UI
         // Code to execute on Unhandled Exceptions
         private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
         {
+            PhoneApplicationService.Current.State.Clear();
+            using (var myIsolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                foreach (var item in myIsolatedStorage.GetFileNames())
+                    myIsolatedStorage.DeleteFile(item);
+            }
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 // An unhandled exception has occurred; break into the debugger

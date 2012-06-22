@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Konz.MyMovies.UI", "Konz.My
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Konz.MyMovies.Core", "Konz.MyMovies.Core\Konz.MyMovies.Core.csproj", "{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Konz.MyMovies.Model", "Konz.MyMovies.Model\Konz.MyMovies.Model.csproj", "{8186C8D8-C39D-45F3-8001-512405955EFA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,16 @@ Global
 		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}.Release|x86.ActiveCfg = Release|Any CPU
+		{8186C8D8-C39D-45F3-8001-512405955EFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8186C8D8-C39D-45F3-8001-512405955EFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8186C8D8-C39D-45F3-8001-512405955EFA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8186C8D8-C39D-45F3-8001-512405955EFA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8186C8D8-C39D-45F3-8001-512405955EFA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8186C8D8-C39D-45F3-8001-512405955EFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8186C8D8-C39D-45F3-8001-512405955EFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8186C8D8-C39D-45F3-8001-512405955EFA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8186C8D8-C39D-45F3-8001-512405955EFA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8186C8D8-C39D-45F3-8001-512405955EFA}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -16,26 +16,15 @@ using Microsoft.Phone.Shell;
 using System.IO.IsolatedStorage;
 using System.Xml.Serialization;
 using System.IO;
+using System.Globalization;
+using Konz.MyMovies.Model;
 
 namespace Konz.MyMovies.UI
 {
     public partial class MainPage : PhoneApplicationPage
     {
-        const string showsFileName = "shows.xml";
-        const string citySetting = "city";
-        const string cityDirty = "cityDirty";
-        const int expirationDays = 1;
-
-
-        List<Showtime> _allShows;
-
-        City _currentCity;
-        Theater _currentTheater;
-        DateTime _currentDate;
-        
-        string _currentTheaterCode;
+        AppState _appState;
         TimeSpan _startTime = TimeSpan.FromHours(9);
-        
 
         // Constructor
         public MainPage()
@@ -43,85 +32,82 @@ namespace Konz.MyMovies.UI
             InitializeComponent();
         }
 
+        #region Navigation Events
+
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            _currentCity = (City) SettingsManager.LoadSetting(citySetting) ?? new City() { Code = "12", Name = "Culiacán" };
-            _currentTheaterCode = (string)SettingsManager.LoadSetting("theater");
-            _currentDate = DateTime.Today;
-            var isCityDirty = (bool?)SettingsManager.LoadSetting(cityDirty) ?? true;
-
-
-            if (PhoneApplicationService.Current.State.ContainsKey("allshows") && !isCityDirty)
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(CityData));
-                var showsString = (string)PhoneApplicationService.Current.State["allshows"];
-                var sr = new StringReader(showsString);
-                _allShows = ((CityData)serializer.Deserialize(sr)).GetShows();
-            }
-
             while (NavigationService.CanGoBack)
                 NavigationService.RemoveBackEntry();
 
-            if (DateTime.Today == _currentDate)
-                sldFromTime.Value = (DateTime.Now - _currentDate).TotalMinutes - _startTime.TotalMinutes;
-            else
-                sldFromTime.Value = 0;
+            var dateList = new List<string>();
+            var date = DateTime.Today;
+            while (date < DateTime.Today.AddDays(7))
+            {
+                dateList.Add(date.ToString("dddd dd MMMM", new CultureInfo("es-MX")));
+                date = date.AddDays(1);
+            }
+            lstDates.ItemsSource = dateList;
 
-            if (_allShows != null)
-                ShowData(_allShows);
-            else
-                PersistableFile<CityData>.Load(showsFileName, new Action<PersistableFile<CityData>, Exception>(ShowsLoadedFromFile));
-            
+            GetAppState(new Action<AppState>(RefreshState));
+
             base.OnNavigatedTo(e);
         }
 
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
         {
-            StringWriter sr = new StringWriter();
-            XmlSerializer serializer = new XmlSerializer(typeof(CityData));
-            serializer.Serialize(sr, CityData.GetCityDataFromShows(_currentCity.Code, _allShows));
-            PhoneApplicationService.Current.State["allshows"] = sr.ToString();
-            sr.Close();
-            SettingsManager.SaveSetting(cityDirty, false);
-            base.OnNavigatedFrom(e);
+            PhoneApplicationService.Current.State[SettingsConstants.AppState] = _appState;
+        }
+        
+        #endregion
+
+        #region Private Methods
+
+        private void GetAppState(Action<AppState> action)
+        {
+            if (PhoneApplicationService.Current.State.ContainsKey(SettingsConstants.AppState))
+            {
+                var state = (AppState)PhoneApplicationService.Current.State[SettingsConstants.AppState];
+                if (state.City.Code == SettingsManager.City.Code && state.Date == SettingsManager.CurrentDate)
+                {
+                    action(state);
+                    return;
+                }
+            }
+
+            PersistableFile<AppState>.Load(SettingsConstants.AppStateFileName, new Action<PersistableFile<AppState>, Exception>(StateLoadedFromFile));
         }
 
-        private void ShowsLoadedFromFile(PersistableFile<CityData> file, Exception error)
+        private void StateLoadedFromFile(PersistableFile<AppState> file, Exception error)
         {
-            if (error == null && file != null && file.ExpirationDate > DateTime.Now && file.Data.CityCode == _currentCity.Code)
-                ShowData(file.Data.GetShows());
+            if (error == null && file.Data.Date == SettingsManager.CurrentDate && file.Data.City.Code == SettingsManager.City.Code)
+                RefreshState(file.Data);
             else
-            {
                 LoadFromInternet();
-            }
         }
 
         private void LoadFromInternet()
         {
             if (Utils.InternetIsAvailable())
-            {
-                var c = new DataExtractor();
-                c.GetShows(_currentCity.Code, _currentDate, new Action<DateTime, List<Showtime>>(ShowsLoadedFromInternet));
-            }
+                new DataExtractor().GetShows(SettingsManager.City, SettingsManager.CurrentDate, new Action<CinepolisData>(StateLoadedFromInternet));
             else
             {
                 MessageBox.Show("No hay connexion a internet. Por favor intente mas tarde.");
-                //NavigationService.GoBack();
+                RefreshState(null);
             }
         }
 
-        private void ShowsLoadedFromInternet(DateTime expiresOn, List<Showtime> result)
+        private void StateLoadedFromInternet(CinepolisData result)
         {
             if (result == null)
                 MessageBox.Show("No pudimos conectarnos al servidor de cinépolis. Por favor intente mas tarde.");
             else
             {
-                var file = new PersistableFile<CityData>()
+                var state = GetAppState(result);
+
+                var file = new PersistableFile<AppState>()
                 {
-                    CreationDate = DateTime.Now,
-                    ExpirationDate = expiresOn,
-                    FileName = showsFileName,
-                    Data = CityData.GetCityDataFromShows(_currentCity.Code, result)
+                    FileName = SettingsConstants.AppStateFileName,
+                    Data = state
                 };
 
                 file.Save(delegate(Exception ex)
@@ -131,110 +117,252 @@ namespace Konz.MyMovies.UI
                         MessageBox.Show("El guardado del archivo local de funciones falló: " + ex.Message);
 #endif
                 });
-                ShowData(result);
+
+                RefreshState(state);
             }
         }
 
-        private void ShowData(List<Showtime> result)
+        private AppState GetAppState(CinepolisData result)
         {
-            _allShows = result;
-
-            var theaters = _allShows.Select(x => x.Theater).Distinct().ToList();
-            
-            if (_currentTheaterCode != null)
-                _currentTheater = theaters.Where(x => x.Code == _currentTheaterCode).SingleOrDefault() ?? theaters[0];
-            else
-                _currentTheater = theaters[0];
-
-            DataContext = theaters;
-            pvtTheaters.SelectedItem = _currentTheater;
-            
-            RefreshShows(result);
-        }
-
-        private void RefreshShows(List<Showtime> shows)
-        {
-            if (_currentTheater == null)
-                return;
-
-            pvtTheaters.Title = _currentCity.Name;
-
-            if (shows == null)
-                shows = new List<Showtime>();
-
-            var time = _startTime.Add(TimeSpan.FromMinutes(sldFromTime.Value));
-            var fromTime = _currentDate.Add(time);
-
-            shows = shows.Where(x => x.Time > fromTime && x.Theater == _currentTheater).ToList();
-
-            var theaterMovies = new List<Movie>();
-            foreach (var movie in shows.Select(x => x.Movie).Distinct())
+            var state = new AppState();
+            state.City = new CityInfo()
             {
-                movie.Shows.Clear();
-                movie.Shows.AddRange(shows.Where(x => x.Movie == movie).ToList());
-                theaterMovies.Add(movie);
+                Code = result.Ciudad.Code,
+                Name = result.Ciudad.Name
+            };
+
+            state.Date = result.Vigencia.de;
+
+            state.City.Movies = (from d in result.Peliculas
+                                 select new MovieInfo()
+                                 {
+                                     Code = d.Code,
+                                     PosterURI = string.Format("http://www.cinepolis.com.mx/imagenes/peliculas/{0}", d.Cartel),
+                                     Sinopsis = d.Sinopsis,
+                                     Title = d.Nombre
+                                 }).ToList();
+            state.City.Theaters = (from d in result.Complejos
+                                   select new TheaterInfo()
+                                   {
+                                       Code = d.Code,
+                                       Name = d.Nombre
+                                   }).ToList();
+
+            var date = state.Date;
+            foreach (var cartelera in result.Carteleras)
+            {
+                var theater = state.City.Theaters.Where(x => x.Code == cartelera.ComplejoCode).SingleOrDefault();
+                
+                //cinepolis bug
+                if (theater == null)
+                    continue;
+
+                foreach (var sala in cartelera.Salas)
+                {
+                    foreach (var h in sala.Horarios)
+                    {
+                        var st = new ShowtimeInfo();
+                        st.MovieCode = cartelera.PeliculaCode;
+                        var timeParts = h.Split(":".ToArray());
+                        var hr = int.Parse(timeParts[0]);
+                        var mn = int.Parse(timeParts[1]);
+                        st.Date = new DateTime(date.Year, date.Month, date.Day, hr, mn, 00);
+                        theater.Showtimes.Add(st);
+                    }
+                }
+            }
+            return state;
+        }
+
+        private void RefreshState(AppState state)
+        {
+            _appState = state;
+            if (state == null)
+                state = GetDefaultState();
+            
+            state.TheaterCode = SettingsManager.TheaterCode;
+
+            pvtTheaters.Title = string.Format("{0} ({1})", state.City.Name, state.Date.ToString("dddd dd MMMM", new CultureInfo("es-MX")));
+            DataContext = state.City.Theaters;
+            var theater = state.City.Theaters.Where(x => x.Code == state.TheaterCode).SingleOrDefault();
+            pvtTheaters.SelectedItem = theater;
+
+            if (DateTime.Today == state.Date)
+                sldFromTime.Value = (DateTime.Now - state.Date).TotalMinutes - _startTime.TotalMinutes;
+            else
+                sldFromTime.Value = 0;
+
+            RefreshShows(state);
+        }
+
+        private void RefreshShows(AppState state)
+        {
+            DateTime fromTime;
+            if (sldFromTime.Value == 0)
+                fromTime = state.Date;
+            else
+                fromTime = state.Date.Add(_startTime.Add(TimeSpan.FromMinutes(sldFromTime.Value)));
+
+            var theater = state.City.Theaters.Where(x => x.Code == state.TheaterCode).SingleOrDefault();
+            var showtimes = theater.Showtimes.Where(x => x.Date > fromTime).ToList();
+            var movieCodes = showtimes.Select(y => y.MovieCode).Distinct().ToList();
+
+            //var movies = state.City.Movies.Where(x=>movieCodes.Contains(x.Code));
+            var movies = new List<MovieInfo>();
+            foreach (var movieCode in movieCodes)
+            {
+                var movie = state.City.Movies.Where(x => x.Code == movieCode).SingleOrDefault();
+                if (movie != null)
+                    movies.Add(movie);
             }
             
-            _currentTheater.Movies.Clear();
-            foreach (var movie in theaterMovies.OrderBy(x=>x.NextShow.Time))
-                _currentTheater.Movies.Add(movie);
+            foreach (var movie in movies)
+            {
+                movie.Showtimes.Clear();
+                var movieShowtimes = showtimes.Where(x => x.MovieCode == movie.Code).ToList();
+                movie.Showtimes.AddRange(movieShowtimes);
+            }
+
+            theater.Movies.Clear();
+            foreach (var m in movies.OrderBy(x => x.NextShow))
+                theater.Movies.Add(m);
         }
+
+        private AppState GetDefaultState()
+        {
+            var state = new AppState()
+            {
+                City = new CityInfo
+                {
+                    Name = "No City Loaded",
+                    Theaters = new List<TheaterInfo>()
+                },
+                Date = DateTime.Today,
+                MovieCode = null,
+                TheaterCode = null
+            };
+
+            return state;
+        }
+
+        #endregion
+
+        #region UI Events
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            var time = _startTime.Add(TimeSpan.FromMinutes(sldFromTime.Value));
-            var fromTime = _currentDate.Add(time);
-            txtTimeFrom.Text = fromTime.ToString("h:mmtt");
+            if (sldFromTime.Value == 0)
+            {
+                var fromTime = _appState.Date;
+                txtTimeFrom.Text = "Anytime";
+            }
+            else
+            {
+                var time = _startTime.Add(TimeSpan.FromMinutes(sldFromTime.Value));
+                var fromTime = _appState.Date.Add(time);
+                txtTimeFrom.Text = fromTime.ToString("h:mmtt");
+            }
+        }
+
+        private void sldFromTime_ManipulationCompleted(object sender, ManipulationCompletedEventArgs e)
+        {
+            RefreshShows(_appState);
         }
 
         private void pvtTheaters_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count > 0)
             {
-                _currentTheater = e.AddedItems[0] as Theater;
-                SettingsManager.SaveSetting("theater", _currentTheater.Code);
-                RefreshShows(_allShows);
+                var code = (e.AddedItems[0] as TheaterInfo).Code;
+                _appState.TheaterCode = code;
+                SettingsManager.TheaterCode = code;
+                RefreshShows(_appState);
             }
         }
 
-        private void MenuCityChange_Click(object sender, EventArgs e)
+        #region Pop Up Selections
+        
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            NavigationService.Navigate(new Uri("/CitySelect.xaml", UriKind.Relative));
-        }
-
-        private void MenuComplexChange_Click(object sender, EventArgs e)
-        {
-            popSelectTheater.IsOpen = true;
+            if (e.AddedItems.Count > 0)
+            {
+                var movie = (MovieInfo)e.AddedItems[0];
+                NavigationService.Navigate(new Uri("/MovieDetail.xaml?m=" + movie.Code, UriKind.Relative));
+            }
         }
 
         private void Theater_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count > 0)
             {
-                pvtTheaters.SelectedItem = (Theater)e.AddedItems[0];
+                pvtTheaters.SelectedItem = (TheaterInfo)e.AddedItems[0];
                 popSelectTheater.IsOpen = false;
             }
         }
 
-        protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
+        private void Dates_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (popSelectTheater.IsOpen)
+            if (e.AddedItems.Count > 0)
             {
-                popSelectTheater.IsOpen = false;
-                e.Cancel = true;
+                SettingsManager.CurrentDate = DateTime.ParseExact((string)e.AddedItems[0], "dddd dd MMMM", new CultureInfo("es-MX"));
+                sldFromTime.Value = 0;
+                popSelectDate.IsOpen = false;
+                LoadFromInternet();
             }
-            else
-                base.OnBackKeyPress(e);
+        }
+        
+        #endregion
+
+        #endregion
+
+        #region AppBar Menu Events
+
+        private void MenuCityChange_Click(object sender, EventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/CitySelect.xaml", UriKind.Relative));
         }
 
-        private void sldFromTime_ManipulationCompleted(object sender, ManipulationCompletedEventArgs e)
+        private void MenuDateChange_Click(object sender, EventArgs e)
         {
-            RefreshShows(_allShows);
+            popSelectDate.IsOpen = true;
+        }
+
+        private void MenuTheaterChange_Click(object sender, EventArgs e)
+        {
+            popSelectTheater.IsOpen = true;
         }
 
         private void MenuRefresh_Click(object sender, EventArgs e)
         {
             LoadFromInternet();
         }
+
+        private void MenuMovies_Click(object sender, EventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/MovieList.xaml", UriKind.Relative));
+        }
+
+        private void MenuClearData_Click(object sender, EventArgs e)
+        {
+            using (var myIsolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                foreach (var item in myIsolatedStorage.GetFileNames())
+                    myIsolatedStorage.DeleteFile(item);
+            }
+        }
+        
+        protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
+        {
+            if (popSelectTheater.IsOpen || popSelectDate.IsOpen)
+            {
+                popSelectTheater.IsOpen = false;
+                popSelectDate.IsOpen = false;
+                e.Cancel = true;
+            }
+            else
+                base.OnBackKeyPress(e);
+        }
+
+        #endregion
     }
 }

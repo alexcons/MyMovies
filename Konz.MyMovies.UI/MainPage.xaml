@@ -10,7 +10,7 @@
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" 
     x:Class="Konz.MyMovies.UI.MainPage"
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="696"
-    SupportedOrientations="Portrait" Orientation="Portrait"
+    SupportedOrientations="PortraitOrLandscape" Orientation="Portrait"
     shell:SystemTray.IsVisible="True" FontSize="{StaticResource PhoneFontSizeLarge}" FontFamily="{StaticResource PhoneFontFamilyNormal}" Foreground="{StaticResource PhoneForegroundBrush}">
 
     <!--Sample code showing usage of ApplicationBar-->
@@ -18,8 +18,10 @@
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
             <shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="Cambiar de Ciudad" Click="MenuCityChange_Click"/>
-                <shell:ApplicationBarMenuItem Text="Cambiar de Complejo" Click="MenuComplexChange_Click"/>
+                <shell:ApplicationBarMenuItem Text="Cambiar de Complejo" Click="MenuTheaterChange_Click"/>
+                <shell:ApplicationBarMenuItem Text="Cambiar fecha" Click="MenuDateChange_Click"/>
                 <shell:ApplicationBarMenuItem Text="Refrescar" Click="MenuRefresh_Click"/>
+                <shell:ApplicationBarMenuItem Text="Ver peliculas" Click="MenuMovies_Click"/>
             </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
@@ -38,7 +40,7 @@
             </controls:Pivot.HeaderTemplate>
             <controls:Pivot.ItemTemplate>
                 <DataTemplate>
-                    <ListBox ItemsSource="{Binding Movies}">
+                    <ListBox ItemsSource="{Binding Movies}" SelectionChanged="ListBox_SelectionChanged">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Height="auto" Width="auto" Margin="0 0 0 10" >
@@ -46,11 +48,11 @@
                                         <ColumnDefinition Width="0.325*"/>
                                         <ColumnDefinition Width="0.675*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Image Source="{Binding PictureImg}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>
+                                    <Image Source="{Binding PosterURI}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>
                                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="5,0,0,0">
-                                        <TextBlock Text="{Binding Name}" FontSize="{StaticResource PhoneFontSizeLarge}" TextWrapping="Wrap" Foreground="{StaticResource PhoneAccentBrush}"/>
+                                        <TextBlock Text="{Binding Title}" FontSize="{StaticResource PhoneFontSizeLarge}" TextWrapping="Wrap" Foreground="{StaticResource PhoneAccentBrush}"/>
                                         <TextBlock Text="{Binding NextShowLegend}" FontSize="{StaticResource PhoneFontSizeSmall}"/>
-                                        <TextBlock Text="{Binding Showtimes}" FontSize="{StaticResource PhoneFontSizeMediumLarge}" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{Binding ShowtimesHours}" FontSize="{StaticResource PhoneFontSizeMediumLarge}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>
@@ -73,6 +75,17 @@
             </Grid>
         </Popup>
 
+        <Popup x:Name="popSelectDate" Height="600" Width="400" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid Background="#FF1A69AC" Height="600" Width="400" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Elige el dia" Grid.Row="0" Margin="20,10,0,0"/>
+                <ListBox x:Name="lstDates" Grid.Row="1" SelectionChanged="Dates_SelectionChanged" Margin="15" Background="{StaticResource PhoneBackgroundBrush}" >
+                </ListBox>
+            </Grid>
+        </Popup>
     </Grid>
 
 </phone:PhoneApplicationPage>

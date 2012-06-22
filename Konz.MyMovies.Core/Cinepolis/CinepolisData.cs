@@ -15,6 +15,8 @@ namespace Konz.MyMovies.Core.Cinepolis
             Carteleras = new List<Cartelera>();
         }
 
+        public City Ciudad { get; set; }
+
         public DateTime Fecha { get; set; }
 
         public Vigencia Vigencia { get; set; }
@@ -24,80 +26,5 @@ namespace Konz.MyMovies.Core.Cinepolis
         public List<Complejo> Complejos { get; set; }
 
         public List<Cartelera> Carteleras { get; set; }
-
-        public List<Showtime> GetShowTimes()
-        {
-            var movies = new List<Movie>();
-            var city = new City()
-            {
-                Code = Carteleras[0].CiudadCode,
-                Name = Carteleras[0].CiudadNombre
-            };
-            
-            foreach (var p in Peliculas)
-            {
-                var m = new Movie()
-                {
-                    Code = p.Code,
-                    Name = p.Nombre,
-                    PictureURI = string.Format("http://www.cinepolis.com.mx/imagenes/peliculas/{0}", p.Cartel),
-                    Sinopsis = p.Sinopsis
-                };
-
-                if (p.Actores != null)
-                {
-                    foreach (var a in p.Actores.Split(",".ToArray()))
-                    {
-                        m.Cast.Add(new Artist()
-                        {
-                            Name = a
-                        });
-                    };
-                }
-                movies.Add(m);
-            }
-            var theaters = new List<Theater>();
-            foreach (var c in Complejos)
-            {
-                var t = new Theater()
-                {
-                    Code = c.Code,
-                    Name = c.Nombre,
-                    Order = int.Parse(c.Orden)
-                };
-
-                foreach (var s in c.Salas)
-                {
-                    t.Rooms.Add( new Room()
-                    {
-                        Code = int.Parse(s.Code),
-                        Name = s.Code,
-                        Order = int.Parse(s.Orden??"0")
-                    });
-                }
-                theaters.Add(t);
-            }
-
-            var shows = new List<Showtime>();
-            foreach (var c in Carteleras)
-            {
-                foreach (var s in c.Salas)
-	            {
-                    foreach (var h in s.Horarios)
-                    {
-                        var st = new Showtime();
-                        st.Theater = theaters.Where(x => x.Code == c.ComplejoCode).SingleOrDefault();
-                        st.Movie = movies.Where(x => x.Code == c.PeliculaCode).SingleOrDefault();
-                        var timeParts = h.Split(":".ToArray());
-                        var hr = int.Parse(timeParts[0]);
-                        var mn = int.Parse(timeParts[1]);
-                        st.Time = new DateTime(Fecha.Year, Fecha.Month, Fecha.Day, hr, mn, 00);
-                        shows.Add(st);
-                    }
-                }
-            }
-
-            return shows;
-        }
     }
 }

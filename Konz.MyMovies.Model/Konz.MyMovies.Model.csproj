@@ -5,12 +5,12 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}</ProjectGuid>
+    <ProjectGuid>{8186C8D8-C39D-45F3-8001-512405955EFA}</ProjectGuid>
     <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Konz.MyMovies.Core</RootNamespace>
-    <AssemblyName>Konz.MyMovies.Core</AssemblyName>
+    <RootNamespace>Konz.MyMovies.Model</RootNamespace>
+    <AssemblyName>Konz.MyMovies.Model</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <TargetFrameworkProfile>WindowsPhone71</TargetFrameworkProfile>
@@ -44,24 +44,23 @@
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Net" />
     <Reference Include="mscorlib.extensions" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cinepolis\CinepolisData.cs" />
-    <Compile Include="Cinepolis\Cartelera.cs" />
-    <Compile Include="Cinepolis\DataExtractor.cs" />
-    <Compile Include="Cinepolis\Complejo.cs" />
-    <Compile Include="Cinepolis\Pelicula.cs" />
-    <Compile Include="City.cs" />
-    <Compile Include="PersistableFile.cs" />
+    <Compile Include="AppState.cs" />
+    <Compile Include="CityInfo.cs" />
+    <Compile Include="MovieInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Cinepolis\Sala.cs" />
-    <Compile Include="Cinepolis\SalaComplejo.cs" />
-    <Compile Include="Cinepolis\Vigencia.cs" />
-    <Compile Include="Utils.cs" />
+    <Compile Include="ShowtimeInfo.cs" />
+    <Compile Include="TheaterInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Konz.MyMovies.Core\Konz.MyMovies.Core.csproj">
+      <Project>{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}</Project>
+      <Name>Konz.MyMovies.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />

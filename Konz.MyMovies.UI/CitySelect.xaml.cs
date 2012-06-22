@@ -20,11 +20,6 @@ namespace Konz.MyMovies.UI
 {
     public partial class CitySelect : PhoneApplicationPage
     {
-        const string citiesFileName = "cities.xml";
-        const string citySetting = "city";
-        const string cityDirty = "cityDirty";
-        const int expirationDays = 10;
-
         public CitySelect()
         {
             InitializeComponent();
@@ -32,30 +27,31 @@ namespace Konz.MyMovies.UI
 
         private void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (PhoneApplicationService.Current.State.ContainsKey("cities"))
-                ShowData((List<City>)PhoneApplicationService.Current.State["cities"]);
+            if (PhoneApplicationService.Current.State.ContainsKey(SettingsConstants.CitiesState))
+                ShowCities((List<City>)PhoneApplicationService.Current.State[SettingsConstants.CitiesState]);
             else
-                PersistableFile<List<City>>.Load(citiesFileName, CitiesLoadedFromFile);
+                PersistableFile<List<City>>.Load(SettingsConstants.CitiesStateFileName, CitiesLoadedFromFile);
         }
 
         private void CitiesLoadedFromFile(PersistableFile<List<City>> file, Exception error)
         {
-            if (error == null && file != null && file.ExpirationDate > DateTime.Now)
+            if (error == null)
+                ShowCities(file.Data);
+            else
+                LoadCitiesFromInternet();
+        }
+
+        private void LoadCitiesFromInternet()
+        {
+            if (Utils.InternetIsAvailable())
             {
-                ShowData(file.Data);
+                var c = new DataExtractor();
+                c.GetCities(new Action<List<City>>(CitiesLoadedFromInternet));
             }
             else
             {
-                if (Utils.InternetIsAvailable())
-                {
-                    var c = new DataExtractor();
-                    c.GetCities(new Action<List<City>>(CitiesLoadedFromInternet));
-                }
-                else
-                {
-                    MessageBox.Show("No hay connexion a internet. Por favor intente mas tarde.");
-                    NavigationService.GoBack();
-                }
+                MessageBox.Show("No hay connexion a internet. Por favor intente mas tarde.");
+                NavigationService.GoBack();
             }
         }
 
@@ -69,9 +65,7 @@ namespace Konz.MyMovies.UI
             {
                 var file = new PersistableFile<List<City>>()
                 {
-                    CreationDate = DateTime.Now,
-                    ExpirationDate = DateTime.Now.AddDays(expirationDays),
-                    FileName = citiesFileName,
+                    FileName = SettingsConstants.CitiesStateFileName,
                     Data = result
                 };
 
@@ -82,25 +76,24 @@ namespace Konz.MyMovies.UI
                         MessageBox.Show("El guardado del archivo local de ciudades falló.");
 #endif
                 });
-
-                ShowData(result);
+                result = result.Where(x => x.CountryCode == "1").ToList();
+                
+                PhoneApplicationService.Current.State[SettingsConstants.CitiesState] = result;
+                ShowCities(result);
             }
         }
 
-        private void ShowData(List<City> result)
+        private void ShowCities(List<City> result)
         {
-            PhoneApplicationService.Current.State["cities"] = result;
-            DataContext = result.Where(x => x.CountryCode == "1").ToArray();
+            DataContext = result;
         }
 
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count > 0)
             {
-                var newCity = e.AddedItems[0] as City;
-                SettingsManager.SaveSetting(citySetting, newCity);
-                SettingsManager.SaveSetting(cityDirty, true);
-                NavigationService.Navigate(new Uri("/MainPage.xaml", UriKind.Relative));
+                SettingsManager.City = e.AddedItems[0] as City;
+                NavigationService.GoBack();
             }
         }
     }
