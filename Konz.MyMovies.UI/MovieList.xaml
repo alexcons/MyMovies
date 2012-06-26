@@ -36,7 +36,7 @@
                                 <ColumnDefinition Width="0.325*"/>
                                 <ColumnDefinition Width="0.675*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Source="{Binding PosterURI}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>
+                            <Image Source="{Binding Poster}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>
                             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="5,0,0,0">
                                 <TextBlock Text="{Binding Title}" FontSize="{StaticResource PhoneFontSizeLarge}" TextWrapping="Wrap" Foreground="{StaticResource PhoneAccentBrush}"/>
                                 <TextBlock Text="{Binding Sinopsis}" FontSize="{StaticResource PhoneFontSizeSmall}" TextWrapping="Wrap"/>                                

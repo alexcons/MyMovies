@@ -14,15 +14,12 @@ namespace Konz.MyMovies.Core
             get
             {
                 var settingName = "city";
-                if (ExistsSetting(settingName))
-                    return (City)LoadSetting(settingName);
-                else
-                    return null;
+                return (City)GetSetting(settingName);
             }
             set
             {
                 var settingName = "city";
-                SaveSetting(settingName, value);
+                _settings[settingName] = value;
             }
         }
 
@@ -31,15 +28,12 @@ namespace Konz.MyMovies.Core
             get
             {
                 var settingName = "theater";
-                if (ExistsSetting(settingName))
-                    return (String)LoadSetting(settingName);
-                else
-                    return null;
+                return (String)GetSetting(settingName);
             }
             set
             {
                 var settingName = "theater";
-                SaveSetting(settingName, value);
+                _settings[settingName] = value;
             }
         }
         
@@ -48,19 +42,13 @@ namespace Konz.MyMovies.Core
             get
             {
                 var settingName = "date";
-                if (ExistsSetting(settingName))
-                {
-                    var date = (DateTime)LoadSetting(settingName);
-                    date = date < DateTime.Today ? DateTime.Today : date;
-                    return date;
-                }
-                else
-                    return DateTime.Today;
+                var value = (DateTime?)GetSetting(settingName);
+                return value??DateTime.Today;
             }
             set
             {
                 var settingName = "date";
-                SaveSetting(settingName, value);
+                _settings[settingName] = value;
             }
         }
 
@@ -69,35 +57,25 @@ namespace Konz.MyMovies.Core
             get
             {
                 var settingName = "internet";
-                if (ExistsSetting(settingName))
-                    return (bool)LoadSetting(settingName);
-                else
-                    return true;
+                var value = (bool?)GetSetting(settingName);
+                return value ?? true;
             }
             set
             {
                 var settingName = "internet";
-                SaveSetting(settingName, value);
+                _settings[settingName] = value;
             }
         }
 
-        public static bool ExistsSetting(string name)
+        public static void SaveSettings()
         {
-            return _settings.Contains(name);
+            _settings.Save();
         }
 
-        public static void SaveSetting(string name, object value)
+        public static object GetSetting(string name)
         {
-            var settings = IsolatedStorageSettings.ApplicationSettings;
-            settings[name] = value;
-            settings.Save();
-        }
-
-        public static object LoadSetting(string name)
-        {
-            var settings = IsolatedStorageSettings.ApplicationSettings;
-            if (settings.Contains(name))
-                return settings[name];
+            if (_settings.Contains(name))
+                return _settings[name];
             return null;
         }
 

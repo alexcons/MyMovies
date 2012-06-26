@@ -14,7 +14,29 @@ namespace Konz.MyMovies.UI
 {
     public partial class LoadingControl : UserControl
     {
-        public string Message { get; set; }
+        public bool IsLoading
+        {
+            get 
+            { 
+                return pgbLoading.Visibility == Visibility.Visible;
+            }
+            set
+            {
+                pgbLoading.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        public string Message
+        {
+            get
+            {
+                return txtMessage.Text;
+            }
+            set
+            {
+                txtMessage.Text = value;
+            }
+        }
         
         public LoadingControl()
         {

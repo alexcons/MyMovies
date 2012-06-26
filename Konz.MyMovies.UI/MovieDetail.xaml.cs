@@ -52,7 +52,7 @@ namespace Konz.MyMovies.UI
             
             txtSinopsis.Text = movie.Sinopsis;
             panMovie.Title = movie.Title;
-            imgPoster.Source = new BitmapImage(new Uri(movie.PosterURI));
+            imgPoster.Source = movie.Poster;
             lstShowtimes.ItemsSource = theaterList;
         }
 

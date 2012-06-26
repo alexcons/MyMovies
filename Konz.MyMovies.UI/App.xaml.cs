@@ -57,22 +57,26 @@ namespace Konz.MyMovies.UI
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+            LoadState();           
         }
 
         // Code to execute when the application is activated (brought to foreground)
         // This code will not execute when the application is first launched
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
-            if (!e.IsApplicationInstancePreserved)
+            if(!e.IsApplicationInstancePreserved)
+                LoadState();
+        }
+
+        private void LoadState()
+        {
+            try
             {
-                try
-                {
-                    AppState.Current = PersistableFile<AppState>.Load(SettingsConstants.AppStateFileName).Data;
-                }
-                catch (Exception)
-                {
-                    AppState.Current = null;
-                }                
+                AppState.Current = PersistableFile<AppState>.Load(SettingsConstants.AppStateFileName).Data;
+            }
+            catch (Exception)
+            {
+                AppState.Current = null;
             }
         }
 
@@ -80,6 +84,20 @@ namespace Konz.MyMovies.UI
         // This code will not execute when the application is closing
         private void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
+            SaveStateAndSettings();
+        }
+
+        // Code to execute when the application is closing (eg, user hit Back)
+        // This code will not execute when the application is deactivated
+        private void Application_Closing(object sender, ClosingEventArgs e)
+        {
+            SaveStateAndSettings();
+        }
+
+        private void SaveStateAndSettings()
+        {
+            SettingsManager.SaveSettings();
+
             if (AppState.Current == null)
                 return;
 
@@ -89,19 +107,7 @@ namespace Konz.MyMovies.UI
                 Data = AppState.Current
             };
 
-            file.Save(delegate(Exception ex)
-            {
-#if DEBUG
-                if (ex != null)
-                    MessageBox.Show(Utils.GetMessage(Error.AppStateFileNotSaved) + ": " + ex.Message);
-#endif
-            });
-        }
-
-        // Code to execute when the application is closing (eg, user hit Back)
-        // This code will not execute when the application is deactivated
-        private void Application_Closing(object sender, ClosingEventArgs e)
-        {
+            file.Save();
         }
 
         // Code to execute if a navigation fails

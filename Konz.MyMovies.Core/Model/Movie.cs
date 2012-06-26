@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 using Konz.MyMovies.Core;
+using System.Windows.Media.Imaging;
 
 namespace Konz.MyMovies.Model
 {
     public class Movie
     {
-
         private string _posterURI;
-
         public string PosterURI
         {
             get 
@@ -20,6 +19,17 @@ namespace Konz.MyMovies.Model
             set { _posterURI = value; }
         }
 
+        private BitmapImage _poster;        
+        [XmlIgnore]
+        public BitmapImage Poster
+        {
+            get
+            {
+                if (_poster == null)
+                    _poster = new BitmapImage(new Uri(PosterURI, UriKind.RelativeOrAbsolute));
+                return _poster;
+            }
+        }
 
         public string Code { get; set; }
         public string Title { get; set; }

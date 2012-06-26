@@ -33,10 +33,14 @@
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent" >
         <Grid.RowDefinitions>
-            <RowDefinition Height="678*"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="90"/>
         </Grid.RowDefinitions>
-        <controls:Pivot x:Name="pvtTheaters" Title="Cargando..." VerticalAlignment="Top" ItemsSource="{Binding}" SelectionChanged="pvtTheaters_SelectionChanged" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="130"/>
+        </Grid.ColumnDefinitions>
+        <controls:Pivot Grid.ColumnSpan="2" x:Name="pvtTheaters" VerticalAlignment="Top" ItemsSource="{Binding}" SelectionChanged="pvtTheaters_SelectionChanged" >
             <controls:Pivot.HeaderTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Foreground="{StaticResource PhoneAccentBrush}"/>
@@ -52,7 +56,7 @@
                                         <ColumnDefinition Width="0.325*"/>
                                         <ColumnDefinition Width="0.675*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Image Source="{Binding PosterURI}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>
+                                    <Image Source="{Binding Poster}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>
                                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="5,0,0,0">
                                         <TextBlock Text="{Binding Title}" FontSize="{StaticResource PhoneFontSizeLarge}" TextWrapping="Wrap" Foreground="{StaticResource PhoneAccentBrush}"/>
                                         <TextBlock Text="{Binding NextShowLegend}" FontSize="{StaticResource PhoneFontSizeSmall}"/>
@@ -65,8 +69,8 @@
                 </DataTemplate>
             </controls:Pivot.ItemTemplate>
         </controls:Pivot>
-        <Slider x:Name="sldFromTime" Minimum="0" Maximum="840" Grid.Row="1" Height="90" Margin="4,0,0,0" ValueChanged="Slider_ValueChanged" ManipulationCompleted="sldFromTime_ManipulationCompleted" HorizontalAlignment="Left" Width="334" />
-        <TextBlock Grid.Row="1" x:Name="txtTimeFrom" FontSize="{StaticResource PhoneFontSizeLarge}" Height="90" HorizontalAlignment="Right" VerticalAlignment="Center" Width="136" />
+        <Slider x:Name="sldFromTime" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ValueChanged="Slider_ValueChanged" ManipulationCompleted="sldFromTime_ManipulationCompleted" Maximum="900" />
+        <TextBlock x:Name="txtTimeFrom" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontSize="{StaticResource PhoneFontSizeLarge}" />
 
         <Popup x:Name="popSelectTheater" Margin="50,50,0,0" VerticalAlignment="Top" Height="506" HorizontalAlignment="Left" Width="380">
             <Grid Background="#FF1A69AC" Width="{Binding ElementName=popSelectTheater, Path=Width}"
@@ -94,7 +98,8 @@
                 </ListBox>
             </Grid>
         </Popup>
-        <my:LoadingControl HorizontalAlignment="Stretch" x:Name="loadingPop" VerticalAlignment="Stretch" Message="Cargando..." />
+
+        <my:LoadingControl Grid.ColumnSpan="2" HorizontalAlignment="Stretch" x:Name="loadingPop" VerticalAlignment="Stretch" Message="Cargando..." />
     </Grid>
 
 </phone:PhoneApplicationPage>
