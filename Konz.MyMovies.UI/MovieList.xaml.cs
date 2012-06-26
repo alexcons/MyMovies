@@ -16,6 +16,8 @@ namespace Konz.MyMovies.UI
             InitializeComponent();
         }
 
+        #region Form Events
+
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             DataContext = AppState.Current.City.Movies.OrderBy(x => x.Title).ToList();
@@ -31,5 +33,7 @@ namespace Konz.MyMovies.UI
                 NavigationService.Navigate(new Uri("/MovieDetail.xaml?m=" + movie.Code, UriKind.Relative));
             }
         }
+
+        #endregion
     }    
 }

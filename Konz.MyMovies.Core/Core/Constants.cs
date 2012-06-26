@@ -1,7 +1,7 @@
 ﻿
 namespace Konz.MyMovies.Core
 {
-    public class SettingsConstants
+    public class Constants
     {
         public const string AppState = "appstate";
         public const string AppStateFileName = "appstate.xml";

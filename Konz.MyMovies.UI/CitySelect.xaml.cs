@@ -37,10 +37,10 @@ namespace Konz.MyMovies.UI
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            if (PhoneApplicationService.Current.State.ContainsKey(SettingsConstants.CitiesState))
-                ShowData((List<City>)PhoneApplicationService.Current.State[SettingsConstants.CitiesState]);
+            if (PhoneApplicationService.Current.State.ContainsKey(Constants.CitiesState))
+                ShowData((List<City>)PhoneApplicationService.Current.State[Constants.CitiesState]);
             else
-                PersistableFile<List<City>>.Load(SettingsConstants.CitiesStateFileName, CitiesLoadedFromFile);
+                PersistableFile<List<City>>.Load(Constants.CitiesStateFileName, CitiesLoadedFromFile);
         }
 
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -88,7 +88,7 @@ namespace Konz.MyMovies.UI
                 
                 var file = new PersistableFile<List<City>>()
                 {
-                    FileName = SettingsConstants.CitiesStateFileName,
+                    FileName = Constants.CitiesStateFileName,
                     Data = result
                 };
 
@@ -100,7 +100,7 @@ namespace Konz.MyMovies.UI
 #endif
                 });
                 
-                PhoneApplicationService.Current.State[SettingsConstants.CitiesState] = file.Data;
+                PhoneApplicationService.Current.State[Constants.CitiesState] = file.Data;
                 ShowData(file.Data);
             }
         }

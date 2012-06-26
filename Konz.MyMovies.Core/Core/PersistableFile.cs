@@ -8,8 +8,15 @@ namespace Konz.MyMovies.Core
 {
     public class PersistableFile<T>
     {
+        #region Properties
+
         public string FileName { get; set; }
+
         public T Data { get; set; }
+
+        #endregion
+
+        #region Public Methods
 
         public void Delete(Action<bool, Exception> OnDeleted)
         {
@@ -67,7 +74,7 @@ namespace Konz.MyMovies.Core
             worker.RunWorkerAsync();
         }
 
-        private bool Delete()
+        public bool Delete()
         {
             using (var myIsolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
             {
@@ -130,5 +137,6 @@ namespace Konz.MyMovies.Core
             return result;
         }
 
+        #endregion
     }
 }

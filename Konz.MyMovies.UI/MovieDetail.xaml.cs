@@ -56,8 +56,6 @@ namespace Konz.MyMovies.UI
             lstShowtimes.ItemsSource = theaterList;
         }
 
-        #endregion
-
         private void PhoneApplicationPage_OrientationChanged(object sender, OrientationChangedEventArgs e)
         {
             if (e.Orientation == PageOrientation.LandscapeRight || e.Orientation == PageOrientation.LandscapeLeft)
@@ -71,6 +69,8 @@ namespace Konz.MyMovies.UI
                 txtSinopsis.SetValue(Grid.RowProperty, 1);
             }
         }
+
+        #endregion
 
     }
 }

@@ -14,6 +14,13 @@ namespace Konz.MyMovies.UI
 {
     public partial class LoadingControl : UserControl
     {
+        public LoadingControl()
+        {
+            InitializeComponent();
+        }
+
+        #region Properties
+        
         public bool IsLoading
         {
             get 
@@ -38,15 +45,6 @@ namespace Konz.MyMovies.UI
             }
         }
         
-        public LoadingControl()
-        {
-            InitializeComponent();
-        }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!string.IsNullOrWhiteSpace(Message))
-                txtMessage.Text = Message;
-        }
+        #endregion
     }
 }

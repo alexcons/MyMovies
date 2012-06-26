@@ -72,7 +72,7 @@ namespace Konz.MyMovies.UI
         {
             try
             {
-                AppState.Current = PersistableFile<AppState>.Load(SettingsConstants.AppStateFileName).Data;
+                AppState.Current = PersistableFile<AppState>.Load(Constants.AppStateFileName).Data;
             }
             catch (Exception)
             {
@@ -103,7 +103,7 @@ namespace Konz.MyMovies.UI
 
             var file = new PersistableFile<AppState>()
             {
-                FileName = SettingsConstants.AppStateFileName,
+                FileName = Constants.AppStateFileName,
                 Data = AppState.Current
             };
 
