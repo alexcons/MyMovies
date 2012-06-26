@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Xml.Serialization;
 using Konz.MyMovies.Core;
 
 namespace Konz.MyMovies.Model
@@ -15,12 +14,8 @@ namespace Konz.MyMovies.Model
         public List<Showtime> Showtimes { get; set; }
         [XmlIgnore]
         public ObservableCollection<Movie> Movies { get; set; }
-
-        public Theater()
-        {
-            Showtimes = new List<Showtime>();
-            Movies = new ObservableCollection<Movie>();
-        }
+        
+        public List<TheaterRoom> TheaterRooms { get; set; }
 
         public string GetShowtimes(string movieCode)
         {
@@ -34,6 +29,15 @@ namespace Konz.MyMovies.Model
             if (Showtimes.Count > 0)
                 result = (from s in Showtimes.Where(x => x.MovieCode == movieCode) orderby s.Date where s.Date > DateTime.Now select s).Take(1).SingleOrDefault();
             return result == null ? DateTime.MaxValue : result.Date;
+        }
+
+        public string Order { get; set; }
+
+        public Theater()
+        {
+            Showtimes = new List<Showtime>();
+            Movies = new ObservableCollection<Movie>();
+            TheaterRooms = new List<TheaterRoom>();
         }
 
     }

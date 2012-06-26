@@ -5,23 +5,27 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:Konz_MyMovies_Core="clr-namespace:Konz.MyMovies.Core;assembly=Konz.MyMovies.Core" 
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls" 
-    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" 
     x:Class="Konz.MyMovies.UI.MainPage"
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="696"
     SupportedOrientations="PortraitOrLandscape" Orientation="Portrait"
-    shell:SystemTray.IsVisible="True" FontSize="{StaticResource PhoneFontSizeLarge}" FontFamily="{StaticResource PhoneFontFamilyNormal}" Foreground="{StaticResource PhoneForegroundBrush}">
+    shell:SystemTray.IsVisible="True" FontSize="{StaticResource PhoneFontSizeLarge}" FontFamily="{StaticResource PhoneFontFamilyNormal}" Foreground="{StaticResource PhoneForegroundBrush}" xmlns:my="clr-namespace:Konz.MyMovies.UI" OrientationChanged="PhoneApplicationPage_OrientationChanged">
 
     <!--Sample code showing usage of ApplicationBar-->
-    <phone:PhoneApplicationPage.ApplicationBar>
+    <phone:PhoneApplicationPage.ApplicationBar>        
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
+            <shell:ApplicationBarIconButton IconUri="/Images/dark/appbar_city.png" Text="Ciudad" Click="MenuCityChange_Click"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/dark/appbar_date.png" Text="Fecha" Click="MenuDateChange_Click"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/dark/appbar_theater.png" Text="Cine" Click="MenuTheaterChange_Click"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/dark/appbar_movie.png" Text="Peliculas" Click="MenuMovies_Click"/>
             <shell:ApplicationBar.MenuItems>
-                <shell:ApplicationBarMenuItem Text="Cambiar de Ciudad" Click="MenuCityChange_Click"/>
-                <shell:ApplicationBarMenuItem Text="Cambiar de Complejo" Click="MenuTheaterChange_Click"/>
-                <shell:ApplicationBarMenuItem Text="Cambiar fecha" Click="MenuDateChange_Click"/>
+                <!--<shell:ApplicationBarMenuItem Text="Cambiar de Ciudad" Click="MenuCityChange_Click"/>-->
+                <!--<shell:ApplicationBarMenuItem Text="Cambiar de Complejo" Click="MenuTheaterChange_Click"/>-->
+                <!--<shell:ApplicationBarMenuItem Text="Cambiar fecha" Click="MenuDateChange_Click"/>-->
+                <!--<shell:ApplicationBarMenuItem Text="Ver peliculas" Click="MenuMovies_Click"/>-->
                 <shell:ApplicationBarMenuItem Text="Refrescar" Click="MenuRefresh_Click"/>
-                <shell:ApplicationBarMenuItem Text="Ver peliculas" Click="MenuMovies_Click"/>
+                <shell:ApplicationBarMenuItem Text="Limpiar Datos" Click="MenuClearData_Click"/>
+                <shell:ApplicationBarMenuItem Text="Toggle Internet" Click="MenuToggleInternet_Click"/>
             </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
@@ -40,7 +44,7 @@
             </controls:Pivot.HeaderTemplate>
             <controls:Pivot.ItemTemplate>
                 <DataTemplate>
-                    <ListBox ItemsSource="{Binding Movies}" SelectionChanged="ListBox_SelectionChanged">
+                    <ListBox ItemsSource="{Binding Movies}" SelectionChanged="Movies_SelectionChanged">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Height="auto" Width="auto" Margin="0 0 0 10" >
@@ -62,22 +66,26 @@
             </controls:Pivot.ItemTemplate>
         </controls:Pivot>
         <Slider x:Name="sldFromTime" Minimum="0" Maximum="840" Grid.Row="1" Height="90" Margin="4,0,0,0" ValueChanged="Slider_ValueChanged" ManipulationCompleted="sldFromTime_ManipulationCompleted" HorizontalAlignment="Left" Width="334" />
-		<TextBlock Grid.Row="1" x:Name="txtTimeFrom" FontSize="{StaticResource PhoneFontSizeLarge}" Height="90" HorizontalAlignment="Right" VerticalAlignment="Center" Width="136" />
+        <TextBlock Grid.Row="1" x:Name="txtTimeFrom" FontSize="{StaticResource PhoneFontSizeLarge}" Height="90" HorizontalAlignment="Right" VerticalAlignment="Center" Width="136" />
 
-        <Popup x:Name="popSelectTheater" Height="600" Width="400" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Grid Background="#FF1A69AC" Height="600" Width="400" >
+        <Popup x:Name="popSelectTheater" Margin="50,50,0,0" VerticalAlignment="Top" Height="506" HorizontalAlignment="Left" Width="380">
+            <Grid Background="#FF1A69AC" Width="{Binding ElementName=popSelectTheater, Path=Width}"
+                  Height="{Binding ElementName=popSelectTheater, Path=Height}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Elige tu Cine" Grid.Row="0" Margin="20,10,0,0"/>
-                <ListBox x:Name="lstTheaters" Grid.Row="1" SelectionChanged="Theater_SelectionChanged" Margin="15" ItemsSource="{Binding}" Background="{StaticResource PhoneBackgroundBrush}" DisplayMemberPath="Name"/>
+                <ListBox x:Name="lstTheaters" Grid.Row="1" SelectionChanged="Theaters_SelectionChanged"                         
+                         Margin="15"  ItemsSource="{Binding}" 
+                         Background="{StaticResource PhoneBackgroundBrush}" DisplayMemberPath="Name" />
             </Grid>
         </Popup>
 
-        <Popup x:Name="popSelectDate" Height="600" Width="400" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Grid Background="#FF1A69AC" Height="600" Width="400" >
-                <Grid.RowDefinitions>
+        <Popup x:Name="popSelectDate" Margin="50,50,0,0" VerticalAlignment="Top" Height="506" HorizontalAlignment="Left" Width="380">
+            <Grid Background="#FF1A69AC" Width="{Binding ElementName=popSelectDate, Path=Width}"
+                  Height="{Binding ElementName=popSelectDate, Path=Height}">
+                <Grid.RowDefinitions >
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
@@ -86,6 +94,7 @@
                 </ListBox>
             </Grid>
         </Popup>
+        <my:LoadingControl HorizontalAlignment="Stretch" x:Name="loadingPop" VerticalAlignment="Stretch" Message="Cargando..." />
     </Grid>
 
 </phone:PhoneApplicationPage>

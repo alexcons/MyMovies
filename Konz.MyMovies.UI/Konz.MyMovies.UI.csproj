@@ -50,25 +50,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="IsolatedStorageExplorer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Phone.Controls, Version=7.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Phone.Controls.Toolkit, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b772ad94eb9ca604, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Phone.Interop" />
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Xml" />
-    <Reference Include="mscorlib.extensions" />
-    <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Source\AppState.cs" />
     <Compile Include="CitySelect.xaml.cs">
       <DependentUpon>CitySelect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LoadingControl.xaml.cs">
+      <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -80,8 +77,6 @@
       <DependentUpon>MovieList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SettingsConstants.cs" />
-    <Compile Include="SettingsManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -89,6 +84,10 @@
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
     <Page Include="CitySelect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LoadingControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -110,28 +109,30 @@
     <None Include="Properties\WMAppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ApplicationIcon.png">
+    <Resource Include="Images\ApplicationIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="Images\Background.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Background.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Resource Include="thumb.png" />
-    <Resource Include="SplashScreenImage.png" />
+    <Content Include="Images\dark\appbar_city.png" />
+    <Content Include="Images\dark\appbar_date.png" />
+    <Content Include="Images\dark\appbar_movie.png" />
+    <Content Include="Images\dark\appbar_theater.png" />
+    <Content Include="Images\light\appbar_city.png" />
+    <Content Include="Images\light\appbar_date.png" />
+    <Content Include="Images\light\appbar_movie.png" />
+    <Content Include="Images\light\appbar_theater.png" />
+    <Resource Include="Images\thumb.png" />
+    <Resource Include="Images\SplashScreenImage.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Konz.MyMovies.Core\Konz.MyMovies.Core.csproj">
+    <ProjectReference Include="..\Konz.MyMovies.Core\Konz.MyMovies.csproj">
       <Project>{CCDFA9CD-50BC-4665-9DD2-478FD7556BB9}</Project>
-      <Name>Konz.MyMovies.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Konz.MyMovies.Model\Konz.MyMovies.Model.csproj">
-      <Project>{8186C8D8-C39D-45F3-8001-512405955EFA}</Project>
-      <Name>Konz.MyMovies.Model</Name>
+      <Name>Konz.MyMovies</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Images\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

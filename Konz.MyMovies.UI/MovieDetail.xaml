@@ -16,10 +16,10 @@
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <Grid x:Name="LayoutRoot">
-        <controls:Panorama Name="panMovie" Title="[moviename]">
+        <controls:Panorama Name="panMovie" Title="Movie Title">
 
             <!--Panorama item one-->
-            <controls:PanoramaItem Name="txtMovieTitle" Header="Pelicula">
+            <controls:PanoramaItem Name="txtMovieTitle" Header="Movie Title" >
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -34,8 +34,8 @@
                 </Grid>
             </controls:PanoramaItem>
             
-            <!--Panorama item three-->
-            <controls:PanoramaItem Header="Horarios">
+            <!--Panorama item two-->
+            <controls:PanoramaItem Name="txtScheadulesTitle" Header="Scheadules">
                 <ListBox Name="lstShowtimes">
                     <ListBox.ItemTemplate>
                         <DataTemplate>

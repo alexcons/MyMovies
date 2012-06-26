@@ -1,15 +1,6 @@
 ﻿using System;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 using Konz.MyMovies.Core;
 
@@ -17,9 +8,21 @@ namespace Konz.MyMovies.Model
 {
     public class Movie
     {
+
+        private string _posterURI;
+
+        public string PosterURI
+        {
+            get 
+            {
+                return Utils.InternetIsAvailable() ? _posterURI : "/Images/Background.png"; 
+            }
+            set { _posterURI = value; }
+        }
+
+
         public string Code { get; set; }
         public string Title { get; set; }
-        public string PosterURI { get; set; }
         public string Sinopsis { get; set; }
         
         [XmlIgnore]
@@ -61,5 +64,10 @@ namespace Konz.MyMovies.Model
             }
         }
 
+        public string Classification { get; set; }
+
+        public string Actors { get; set; }
+
+        public string Rating { get; set; }
     }
 }

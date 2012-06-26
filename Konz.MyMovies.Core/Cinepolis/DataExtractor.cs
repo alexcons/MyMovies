@@ -1,35 +1,31 @@
 ﻿using System;
-using System.IO;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.Xml;
 using System.Collections.Generic;
-using Konz.MyMovies.Core;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Xml;
+using Konz.MyMovies.Model;
 
 namespace Konz.MyMovies.Core.Cinepolis
 {
     public class DataExtractor
     {
-        private string ShowsRootPath { get; set; }
-        private string CitiesRootPath { get; set; }
-        Action<CinepolisData> OnCompleteShows;
-        Action<List<City>> OnCompleteCities;
-        public DataExtractor()
-        {
-            ShowsRootPath = @"http://www.cinepolis.com.mx/Cartelera/XMLCinepolis/{0}_{1}.xml";
-            CitiesRootPath = @"http://www.cinepolis.com.mx/widget/aspx/ciudades.aspx";
-        }
+        #region Fields
 
+        const string ShowsRootPath = @"http://www.cinepolis.com.mx/Cartelera/XMLCinepolis/{0}_{1}.xml";
+        const string CitiesRootPath = @"http://www.cinepolis.com.mx/widget/aspx/ciudades.aspx";
+        const string ImagesRootPath = @"http://www.cinepolis.com.mx/imagenes/peliculas/{0}";
+        
         City _city;
         DateTime _date;
+        
+        Action<City> OnCompleteShows;
+        Action<List<City>> OnCompleteCities;
+
+        #endregion
+
+        #region Public Methods
 
         public void GetCities(Action<List<City>> OnComplete)
         {
@@ -39,7 +35,7 @@ namespace Konz.MyMovies.Core.Cinepolis
             wc.DownloadStringAsync(new Uri(CitiesRootPath));
         }
 
-        public void GetShows(City city, DateTime date, Action<CinepolisData> OnComplete)
+        public void GetCityData(City city, DateTime date, Action<City> OnComplete)
         {
             this._city = city;
             this._date = date;            
@@ -50,7 +46,11 @@ namespace Konz.MyMovies.Core.Cinepolis
             wc.DownloadStringAsync(new Uri(string.Format(ShowsRootPath, city.Code, date.ToString("yyyyMMdd"))));
         }
 
-        void GetCinepolisCitiesComplete(object sender, DownloadStringCompletedEventArgs e)
+        #endregion
+
+        #region Read Cities
+
+        private void GetCinepolisCitiesComplete(object sender, DownloadStringCompletedEventArgs e)
         {
             var reader = XmlReader.Create(new StringReader(e.Result));
             var cities = new List<City>();
@@ -58,15 +58,14 @@ namespace Konz.MyMovies.Core.Cinepolis
             {
                 if (reader.Name.Equals("ciudad"))
                 {
-                    var c = ReadCiudad(reader);
+                    var c = ReadCity(reader);
                     cities.Add(c);
                 }
             }
-
             OnCompleteCities(cities);
         }
 
-        private City ReadCiudad(XmlReader reader)
+        private City ReadCity(XmlReader reader)
         {
             var c = new City();
             string val;
@@ -82,68 +81,72 @@ namespace Konz.MyMovies.Core.Cinepolis
             return c;
         }
 
-        void GetCinepolisShowsComplete(object sender, DownloadStringCompletedEventArgs e)
+        #endregion
+
+        #region Read Showtimes
+
+        private void GetCinepolisShowsComplete(object sender, DownloadStringCompletedEventArgs e)
         {
             var reader = XmlReader.Create(new StringReader(e.Result));
-            var data = new CinepolisData()
+            var data = new ShowtimeData()
             {
-                Fecha = _date,
-                Ciudad = _city
+                Date = _date,
+                City = _city
             };
 
             while (reader.Read() && (reader.Name != "cinepolis" || reader.NodeType != XmlNodeType.EndElement))
             {
                 if (reader.Name.Equals("vigencia"))
                 {
-                    data.Vigencia = ReadVigencia(reader);
+                    data.Expiration = ReadExpiration(reader);
                 }
 
                 if (reader.Name.Equals("pelicula"))
                 {                    
-                    data.Peliculas.Add(ReadPelicula(reader));
+                    data.Movies.Add(ReadMovie(reader));
                 }
                     
                 if (reader.Name.Equals("complejo"))
                 {
-                    data.Complejos.Add(ReadComplejo(reader));
+                    data.Theaters.Add(ReadTheater(reader));
                 }
 
                 if (reader.Name.Equals("cartelera"))
                 {
-                    data.Carteleras.Add(ReadCartelera(reader));
+                    data.Carteleras.Add(ReadShowtimeScheadule(reader));
                 }
             }
             if (data.Carteleras.Count == 0)
                 OnCompleteShows(null);
             else
-                OnCompleteShows(data);
+                OnCompleteShows(FillCityWithData(_city, data));
         }
 
-        private Cartelera ReadCartelera(XmlReader reader)
+        private ShowtimeScheadule ReadShowtimeScheadule(XmlReader reader)
         {
-            var c = new Cartelera();
+            var c = new ShowtimeScheadule();
             while (reader.Read() && reader.Name != "cartelera" || reader.NodeType != XmlNodeType.EndElement)
             {
                 string val;
                 if (reader.Name == "cartelera" && reader.NodeType != XmlNodeType.EndElement && GetAttribute(reader, "nombre", out val))
-                    c.CiudadNombre = val;                    
+                    c.CityName = val;                    
                 if (GetValue(reader, "ciudad", out val))
-                    c.CiudadCode = val;
+                    c.CityCode = val;
                 if (GetValue(reader, "complejoid", out val))
-                    c.ComplejoCode = val;
+                    c.TheaterCode = val;
                 if (GetValue(reader, "pelicula", out val))
-                    c.PeliculaCode = val;
+                    c.MovieCode = val;
                 if (GetValue(reader, "estreno", out val))
-                    c.EsEstreno = val;
+                    c.IsNew = val;
                 if (reader.Name == "sala" && reader.NodeType != XmlNodeType.EndElement)
-                    c.Salas.Add(ReadSalaCartelera(reader));
+                    c.ShowtimeRooms.Add(ReadShowtimeRoom(reader, c.MovieCode));
             }
             return c;
         }
 
-        private SalaCartelera ReadSalaCartelera(XmlReader reader)
+        private ShowtimeRoom ReadShowtimeRoom(XmlReader reader, string movieCode)
         {
-            var s = new SalaCartelera();
+            var s = new ShowtimeRoom();
             string val;
             if (GetAttribute(reader, "numero", out val))
                 s.Code = val;
@@ -153,35 +156,35 @@ namespace Konz.MyMovies.Core.Cinepolis
                 {
                     string id, hr;
                     if (GetAttribute(reader, "idshowtime", out id) && GetAttribute(reader, "hr", out hr))
-                        s.Horarios.Add(hr);
+                        s.Showtimes.Add(new Showtime(movieCode, _date, hr));
                 }
             }
             return s;
         }
 
-        private Complejo ReadComplejo(XmlReader reader)
+        private Theater ReadTheater(XmlReader reader)
         {
-            var c = new Complejo();
+            var c = new Theater();
             string val;
             while (reader.Read() && reader.Name != "complejo" || reader.NodeType != XmlNodeType.EndElement)
             {
                 if (GetValue(reader, "complejoid", out val))
                     c.Code = val;
-                if (GetValue(reader, "ciudad", out val))
-                    c.CiudadCode = val;
+                //if (GetValue(reader, "ciudad", out val))
+                //    c.CiudadCode = val;
                 if (GetValue(reader, "nombre", out val))
-                    c.Nombre = val;
+                    c.Name = val;
                 if (GetValue(reader, "orden", out val))
-                    c.Orden = val;
+                    c.Order = val;
                 if (reader.Name == "sala" && reader.NodeType != XmlNodeType.EndElement)
-                    c.Salas.Add(ReadSalaComplejo(reader));
+                    c.TheaterRooms.Add(ReadTheaterRoom(reader));
             }
             return c;
         }
 
-        private SalaComplejo ReadSalaComplejo(XmlReader reader)
+        private TheaterRoom ReadTheaterRoom(XmlReader reader)
         {
-            var s = new SalaComplejo();
+            var s = new TheaterRoom();
             string val;
             while (reader.Read() && reader.Name != "sala" || reader.NodeType != XmlNodeType.EndElement)
             {
@@ -190,50 +193,54 @@ namespace Konz.MyMovies.Core.Cinepolis
                 if (GetValue(reader, "orden", out val))
                     s.Orden = val;
                 if (GetValue(reader, "sonido", out val))
-                    s.Sonidos.Add(val);
+                    s.Features.Add(val);
             }
             return s;
         }
 
-        private Pelicula ReadPelicula(XmlReader reader)
+        private Movie ReadMovie(XmlReader reader)
         {
-            var p = new Pelicula();
+            var p = new Movie();
             string val;
-            if (GetAttribute(reader, "peliculaid", out val))
-                p.CodeAlt = val;
+            //if (GetAttribute(reader, "peliculaid", out val))
+            //    p.CodeAlt = val;
             if (GetAttribute(reader, "peliculaidVista", out val))
                 p.Code = val;
             if (GetAttribute(reader, "nombre", out val))
-                p.Nombre = val;
+                p.Title = val;
             while (reader.Read() && reader.Name != "pelicula" || reader.NodeType != XmlNodeType.EndElement)
             {
                 if (GetValue(reader, "clasificacion", out val))
-                    p.Clasificacion = val;
+                    p.Classification = val;
                 if (GetValue(reader, "imagencartel", out val))
-                    p.Cartel = val;
+                    p.PosterURI = string.Format(ImagesRootPath, val);
                 if (GetValue(reader, "sinopsis", out val))
                     p.Sinopsis = val;
                 if (GetValue(reader, "actores", out val))
-                    p.Actores = val;
+                    p.Actors = val;
                 if (GetValue(reader, "calificacion", out val))
-                    p.Calificacion = val;
+                    p.Rating = val;
             }
             return p;
         }
 
-        private Vigencia ReadVigencia(XmlReader reader)
+        private Expiration ReadExpiration(XmlReader reader)
         {
-            var v = new Vigencia();
+            var v = new Expiration();
             while (reader.Read() && reader.Name != "vigencia" || reader.NodeType != XmlNodeType.EndElement)
             {
                 var culture = new CultureInfo("en-US");
                 if (reader.Name == "de" && reader.NodeType != XmlNodeType.EndElement)
-                    v.de = DateTime.ParseExact(reader.GetAttribute("fecha").Trim(), "MM/dd/yyyy", culture);
+                    v.From = DateTime.ParseExact(reader.GetAttribute("fecha").Trim(), "MM/dd/yyyy", culture);
                 if (reader.Name == "hasta" && reader.NodeType != XmlNodeType.EndElement)
-                    v.hasta = DateTime.ParseExact(reader.GetAttribute("fecha").Trim(), "MM/dd/yyyy", culture);
+                    v.Until = DateTime.ParseExact(reader.GetAttribute("fecha").Trim(), "MM/dd/yyyy", culture);
             }
             return v;
         }
+
+        #endregion
+
+        #region XML Reading Methods
 
         private bool GetAttribute(XmlReader reader, string attributeName, out string result)
         {
@@ -247,6 +254,27 @@ namespace Konz.MyMovies.Core.Cinepolis
             if (reader.Name == elementName && reader.NodeType != XmlNodeType.EndElement)
                 result = reader.ReadElementContentAsString().Trim();
             return !string.IsNullOrWhiteSpace(result);
+        }
+
+        #endregion
+
+        private City FillCityWithData(City city, ShowtimeData data)
+        {
+            city.Movies = data.Movies;
+            city.Theaters = data.Theaters;
+
+            foreach (var cartelera in data.Carteleras)
+            {
+                var theater = city.Theaters.Where(x => x.Code == cartelera.TheaterCode).SingleOrDefault();
+
+                //cinepolis bug
+                if (theater == null)
+                    continue;
+
+                foreach (var sala in cartelera.ShowtimeRooms)
+                    theater.Showtimes.AddRange(sala.Showtimes);
+            }
+            return city;
         }
 
     }

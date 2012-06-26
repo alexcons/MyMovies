@@ -37,6 +37,6 @@ namespace Konz.MyMovies.Model
             }
         }
         public string MovieCode { get; set; }
-        public CityInfo City { get; set; }
+        public City City { get; set; }
     }
 }
