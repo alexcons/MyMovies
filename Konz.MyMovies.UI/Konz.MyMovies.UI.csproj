@@ -112,9 +112,9 @@
     <Resource Include="Images\ApplicationIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Content Include="Images\Background.png">
+    <Resource Include="Images\Background.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </Resource>
     <Content Include="Images\dark\appbar_city.png" />
     <Content Include="Images\dark\appbar_date.png" />
     <Content Include="Images\dark\appbar_movie.png" />
