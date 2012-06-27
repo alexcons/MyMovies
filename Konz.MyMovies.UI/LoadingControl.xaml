@@ -6,7 +6,7 @@
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}" Loaded="UserControl_Loaded">
+    Foreground="{StaticResource PhoneForegroundBrush}" >
 
     <Grid x:Name="LayoutRoot" Background="{StaticResource PhoneBackgroundBrush}" >
         <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Center" >

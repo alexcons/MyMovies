@@ -123,7 +123,6 @@
     <Content Include="Images\light\appbar_date.png" />
     <Content Include="Images\light\appbar_movie.png" />
     <Content Include="Images\light\appbar_theater.png" />
-    <Resource Include="Images\thumb.png" />
     <Resource Include="Images\SplashScreenImage.png" />
   </ItemGroup>
   <ItemGroup>

@@ -51,7 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cinepolis\ShowtimeData.cs" />
-    <Compile Include="Core\SettingsConstants.cs" />
+    <Compile Include="Core\Constants.cs" />
     <Compile Include="Core\SettingsManager.cs" />
     <Compile Include="Model\ShowtimeScheadule.cs" />
     <Compile Include="Cinepolis\DataExtractor.cs" />
