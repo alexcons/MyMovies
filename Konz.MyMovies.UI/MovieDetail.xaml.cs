@@ -72,5 +72,15 @@ namespace Konz.MyMovies.UI
 
         #endregion
 
+        private void lstShowtimes_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+            {
+                var theater = (Theater)e.AddedItems[0];
+                AppState.Current.TheaterCode = theater.Code;
+                NavigationService.Navigate(new Uri("/MainPage.xaml", UriKind.Relative));
+            }
+        }
+
     }
 }

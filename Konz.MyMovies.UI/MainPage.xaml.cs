@@ -33,8 +33,8 @@ namespace Konz.MyMovies.UI
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            while (NavigationService.CanGoBack)
-                NavigationService.RemoveBackEntry();
+            //while (NavigationService.CanGoBack)
+            //    NavigationService.RemoveBackEntry();
             
             if (SettingsManager.City == null)
             {

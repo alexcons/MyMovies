@@ -36,7 +36,7 @@
             
             <!--Panorama item two-->
             <controls:PanoramaItem Name="txtScheadulesTitle" Header="Scheadules">
-                <ListBox Name="lstShowtimes">
+                <ListBox Name="lstShowtimes" SelectionChanged="lstShowtimes_SelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>

@@ -15,17 +15,17 @@ namespace Konz.MyMovies.Core
 
         public static string GetLongDate(DateTime date)
         {
-            return date.ToString("dddd dd MMMM", culture);
+            return date.ToString(@"d \de MMMM - dddd", culture);
         }
 
         public static DateTime ParseLongDate(string date)
         {
-            return DateTime.ParseExact(date, "dddd dd MMMM", culture);
+            return DateTime.ParseExact(date, @"d \de MMMM - dddd", culture);
         }
 
         public static string GetTimeFormat(DateTime time)
         {
-            return time.ToString("h:mmtt");
+            return time.ToString(@"h:mmt\m");
         }
 
         public static string GetMessage(Error error)

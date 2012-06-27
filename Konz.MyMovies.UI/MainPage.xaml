@@ -32,7 +32,7 @@
     <Grid x:Name="LayoutRoot" Background="Transparent" >
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="90"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -67,7 +67,7 @@
                 </DataTemplate>
             </controls:Pivot.ItemTemplate>
         </controls:Pivot>
-        <Slider x:Name="sldFromTime" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ValueChanged="Slider_ValueChanged" ManipulationCompleted="sldFromTime_ManipulationCompleted" Maximum="900" />
+        <Slider x:Name="sldFromTime" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ValueChanged="Slider_ValueChanged" ManipulationCompleted="sldFromTime_ManipulationCompleted" Maximum="900" Style="{StaticResource TimeSlider}" />
         <TextBlock x:Name="txtTimeFrom" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontSize="{StaticResource PhoneFontSizeLarge}" />
 
         <Popup x:Name="popSelectTheater" Margin="50,50,0,0" VerticalAlignment="Top" Height="506" HorizontalAlignment="Left" Width="380">
