@@ -24,8 +24,6 @@
                 <!--<shell:ApplicationBarMenuItem Text="Cambiar fecha" Click="MenuDateChange_Click"/>-->
                 <!--<shell:ApplicationBarMenuItem Text="Ver peliculas" Click="MenuMovies_Click"/>-->
                 <shell:ApplicationBarMenuItem Text="Refrescar" Click="MenuRefresh_Click"/>
-                <shell:ApplicationBarMenuItem Text="Limpiar Datos" Click="MenuClearData_Click"/>
-                <shell:ApplicationBarMenuItem Text="Toggle Internet" Click="MenuToggleInternet_Click"/>
             </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
