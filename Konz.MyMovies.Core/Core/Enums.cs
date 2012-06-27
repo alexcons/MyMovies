@@ -12,6 +12,9 @@
     {
         ChooseCity,
         Sheadules,
-        AnyTime
+        AnyTime,
+        Loading,
+        NoData,
+        NoMoreShows
     }
 }

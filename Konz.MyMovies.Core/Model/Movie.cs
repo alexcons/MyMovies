@@ -25,7 +25,7 @@ namespace Konz.MyMovies.Model
         {
             get
             {
-                if (_poster == null)
+                if (_poster == null && PosterURI != null)
                     _poster = new BitmapImage(new Uri(PosterURI, UriKind.RelativeOrAbsolute));
                 return _poster;
             }

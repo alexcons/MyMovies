@@ -51,7 +51,7 @@ namespace Konz.MyMovies.UI
             }
             lstDates.ItemsSource = dateList;
 
-            ShowLoading();
+            ShowLoading(Utils.GetMessage(Info.Loading), true);
 
             GetAppState();
 
@@ -106,14 +106,15 @@ namespace Konz.MyMovies.UI
             }
 
             AppState.Current = state;
+            var theater = AppState.Current.City.Theaters.Where(x => x.Code == AppState.Current.TheaterCode).SingleOrDefault();
 
             pvtTheaters.Title = string.Format("{0} ({1})", AppState.Current.City.Name, Utils.GetLongDate(AppState.Current.Date));
-
             //TODO: Check if this doe not trigger a selection change event
-            //pvtTheaters.SelectedIndex = -1;
+            //DataContext = null;
+            pvtTheaters.SelectedIndex = 0;
             DataContext = AppState.Current.City.Theaters;
-            var theater = AppState.Current.City.Theaters.Where(x => x.Code == AppState.Current.TheaterCode).SingleOrDefault();
-            if (theater != null) pvtTheaters.SelectedItem = theater;
+            if (theater != null) 
+                pvtTheaters.SelectedItem = theater;
 
             if (AppState.Current.Date == DateTime.Today)
                 sldFromTime.Value = (DateTime.Now - AppState.Current.Date).TotalMinutes - _startTime.TotalMinutes;
@@ -126,10 +127,7 @@ namespace Konz.MyMovies.UI
         private void NoDataLoaded()
         {
             if (App.Current == null)
-            {
-                loadingPop.Message = "No hay datos, selecciona refrescar";
-                loadingPop.IsLoading = false;
-            }
+                ShowLoading(Utils.GetMessage(Info.NoData), true);
             else
                 HideLoading();
         }
@@ -141,9 +139,13 @@ namespace Konz.MyMovies.UI
                 return;
 
             DateTime fromTime = sldFromTime.Value == 0 ? state.Date: state.Date.Add(_startTime.Add(TimeSpan.FromMinutes(sldFromTime.Value)));
-            var theaterCode = state.TheaterCode;
-            theaterCode = theaterCode ?? state.City.Theaters[0].Code;
-            var theater = state.City.Theaters.Where(x => x.Code == theaterCode).SingleOrDefault();
+            
+            Theater theater;
+            if (state.TheaterCode == null || !state.City.Theaters.Where(x => x.Code == state.TheaterCode).Any())
+                theater = state.City.Theaters[0];
+            else
+                theater = state.City.Theaters.Where(x => x.Code == state.TheaterCode).SingleOrDefault();
+
             var showtimes = theater.Showtimes.Where(x => x.Date > fromTime).ToList();
             var movieCodes = showtimes.Select(x => x.MovieCode).Distinct().ToList();
             var movies = state.City.Movies.Where(x=>movieCodes.Contains(x.Code));
@@ -155,13 +157,16 @@ namespace Konz.MyMovies.UI
             foreach (var item in movies.Where(x => x.Showtimes.Count > 0).OrderBy(x => x.NextShow))
                 theater.Movies.Add(item);
 
-            HideLoading();
+            if (theater.Movies.Count == 0)
+                ShowLoading(Utils.GetMessage(Info.NoMoreShows), false);
+            else
+                HideLoading();
         }
 
-        private void ShowLoading()
+        private void ShowLoading(string message, bool WorkInProgress)
         {
-            loadingPop.Message = "Cargando...";
-            loadingPop.IsLoading = true;
+            loadingPop.Message = message;
+            loadingPop.IsLoading = WorkInProgress;
             loadingPop.Visibility = Visibility.Visible;
         }
 
@@ -217,11 +222,11 @@ namespace Konz.MyMovies.UI
                 return;
             if (e.AddedItems.Count > 0)
             {
-                ShowLoading();
+                ShowLoading(Utils.GetMessage(Info.Loading), true);
                 var code = (e.AddedItems[0] as Theater).Code;
                 lstTheaters.SelectedIndex = -1;
                 AppState.Current.TheaterCode = code;
-                //SettingsManager.TheaterCode = code;
+                SettingsManager.TheaterCode = code;
                 RefreshShows();
             }
         }
@@ -261,7 +266,7 @@ namespace Konz.MyMovies.UI
         {
             if (e.AddedItems.Count > 0)
             {
-                ShowLoading();
+                ShowLoading(Utils.GetMessage(Info.Loading), true);
                 SettingsManager.CurrentDate = Utils.ParseLongDate((string)e.AddedItems[0]);
                 sldFromTime.Value = 0;
                 popSelectDate.IsOpen = false;
@@ -299,7 +304,7 @@ namespace Konz.MyMovies.UI
 
         private void MenuRefresh_Click(object sender, EventArgs e)
         {
-            ShowLoading();
+            ShowLoading(Utils.GetMessage(Info.Loading), true);
             LoadFromInternet();
         }
 
