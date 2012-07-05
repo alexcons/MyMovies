@@ -9,24 +9,24 @@ namespace Konz.MyMovies.Model
 {
     public class Movie
     {
-        private string _posterURI;
-        public string PosterURI
+        private string _posterUri;
+        public string PosterUri
         {
-            get 
+            get
             {
-                return Utils.InternetIsAvailable() ? _posterURI : "/Images/Background.png"; 
+                return Utils.InternetIsAvailable() ? _posterUri : "/Images/Background.png";
             }
-            set { _posterURI = value; }
+            set { _posterUri = value; }
         }
 
-        private BitmapImage _poster;        
+        private BitmapImage _poster;
         [XmlIgnore]
         public BitmapImage Poster
         {
             get
             {
-                if (_poster == null && PosterURI != null)
-                    _poster = new BitmapImage(new Uri(PosterURI, UriKind.RelativeOrAbsolute));
+                if (_poster == null && PosterUri != null)
+                    _poster = new BitmapImage(new Uri(PosterUri, UriKind.RelativeOrAbsolute));
                 return _poster;
             }
         }
@@ -34,7 +34,7 @@ namespace Konz.MyMovies.Model
         public string Code { get; set; }
         public string Title { get; set; }
         public string Sinopsis { get; set; }
-        
+
         [XmlIgnore]
         public List<Showtime> Showtimes { get; set; }
 
@@ -42,7 +42,7 @@ namespace Konz.MyMovies.Model
         {
             Showtimes = new List<Showtime>();
         }
-        
+
         public string ShowtimesHours
         {
             get
@@ -58,18 +58,38 @@ namespace Konz.MyMovies.Model
             {
                 if (NextShow == DateTime.MaxValue)
                     return "Hoy no hay mas funciones";
-                var mins = Math.Round(NextShow.Subtract(DateTime.Now).TotalMinutes);
-                return "Empieza en " + mins.ToString() + " minutos";
+
+
+                var mins = NextShow.Subtract(DateTime.Now).Minutes;
+                var hours = (int)NextShow.Subtract(DateTime.Now).TotalHours;
+                string hoursLegend = string.Empty;
+                string minsLegend = string.Empty;
+                string message = string.Empty;
+
+                if (hours >= 1)
+                    hoursLegend = " {0} " + (hours >= 2 ? "horas" : "hora");
+
+                if (mins >= 1)
+                    minsLegend = " {1} " + (mins >= 2 ? "minutos" : "minuto");
+
+                if (hours == 0 && mins > 0 && mins < 5)
+                    message = "Empieza ahora!";
+                else if (hours == 0 && mins <= 0 && mins > -10)
+                    message = "Acaba de empezar todavia alcanzas!";
+                else
+                    message = "Empieza en";
+
+                return string.Format(message + hoursLegend + minsLegend, hours.ToString(), mins.ToString());
             }
         }
-        
+
         public DateTime NextShow
         {
             get
             {
                 Showtime result = null;
                 if (Showtimes.Count > 0)
-                    result = (from s in Showtimes orderby s.Date where s.Date > DateTime.Now select s).Take(1).SingleOrDefault();
+                    result = (from s in Showtimes orderby s.Date where s.Date > DateTime.Now.Subtract(TimeSpan.FromMinutes(10)) select s).Take(1).SingleOrDefault();
                 return result == null ? DateTime.MaxValue : result.Date;
             }
         }
@@ -81,3 +101,4 @@ namespace Konz.MyMovies.Model
         public string Rating { get; set; }
     }
 }
+
