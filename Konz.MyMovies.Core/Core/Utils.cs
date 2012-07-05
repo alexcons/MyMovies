@@ -25,7 +25,7 @@ namespace Konz.MyMovies.Core
 
         public static string GetTimeFormat(DateTime time)
         {
-            return time.ToString(@"h:mmt\m");
+            return time.ToString(@"h:mmt\m").ToLower();
         }
 
         public static string GetMessage(Error error)

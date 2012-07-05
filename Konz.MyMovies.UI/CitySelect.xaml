@@ -27,7 +27,7 @@
         </StackPanel>
 
         <!--ContentPanel - place additional content here-->
-        <ListBox ItemsSource="{Binding}" Grid.Row="1" SelectionChanged="ListBox_SelectionChanged">
+        <ListBox ItemsSource="{Binding}" Grid.Row="1" SelectionChanged="ListBox_SelectionChanged" Margin="25,5,0,30">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}" FontSize="{StaticResource PhoneFontSizeLarge}" TextWrapping="Wrap" ></TextBlock>
