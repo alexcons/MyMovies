@@ -138,7 +138,7 @@ namespace Konz.MyMovies.UI
             if (state == null)
                 return;
 
-            DateTime fromTime = sldFromTime.Value == 0 ? state.Date: state.Date.Add(_startTime.Add(TimeSpan.FromMinutes(sldFromTime.Value)));
+            DateTime fromTime = sldFromTime.Value == 0 ? state.Date: state.Date.Add(_startTime.Add(TimeSpan.FromMinutes(sldFromTime.Value - 10 )));
             
             Theater theater;
             if (state.TheaterCode == null || !state.City.Theaters.Where(x => x.Code == state.TheaterCode).Any())
@@ -158,7 +158,7 @@ namespace Konz.MyMovies.UI
                 theater.Movies.Add(item);
 
             if (theater.Movies.Count == 0)
-                ShowLoading(Utils.GetMessage(Info.NoMoreShows), false);
+                ShowLoading(string.Format(Utils.GetMessage(Info.NoMoreShows), theater.Name), false);
             else
                 HideLoading();
         }

@@ -213,7 +213,7 @@ namespace Konz.MyMovies.Core.Cinepolis
                 if (GetValue(reader, "clasificacion", out val))
                     p.Classification = val;
                 if (GetValue(reader, "imagencartel", out val))
-                    p.PosterURI = string.Format(ImagesRootPath, val);
+                    p.PosterUri = string.Format(ImagesRootPath, val);
                 if (GetValue(reader, "sinopsis", out val))
                     p.Sinopsis = val;
                 if (GetValue(reader, "actores", out val))

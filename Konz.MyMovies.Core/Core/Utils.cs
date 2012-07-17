@@ -25,7 +25,7 @@ namespace Konz.MyMovies.Core
 
         public static string GetTimeFormat(DateTime time)
         {
-            return time.ToString(@"h:mmt\m");
+            return time.ToString(@"h:mmt\m").ToLower();
         }
 
         public static string GetMessage(Error error)
@@ -60,7 +60,7 @@ namespace Konz.MyMovies.Core
                 case Info.NoData:
                     return "No hay datos";
                 case Info.NoMoreShows:
-                    return "No hay mas funciones :(";
+                    return "En {0} no hay mas funciones :("; 
                 default:
                     return "Info No identificado";
             }
