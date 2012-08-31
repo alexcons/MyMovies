@@ -20,7 +20,7 @@
     </SupportedCultures>
     <XapOutputs>true</XapOutputs>
     <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
-    <XapFilename>Konz.MyMovies.UI.xap</XapFilename>
+    <XapFilename>Konz.MyMovies.xap</XapFilename>
     <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
     <SilverlightAppEntry>Konz.MyMovies.UI.App</SilverlightAppEntry>
     <ValidateXaml>true</ValidateXaml>

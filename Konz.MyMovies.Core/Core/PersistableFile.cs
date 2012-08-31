@@ -60,15 +60,12 @@ namespace Konz.MyMovies.Core
 
             worker.DoWork += delegate(object sender, DoWorkEventArgs e)
             {
-                e.Result = Load(FileName);
+                e.Result = Load(FileName);                
             };
 
             worker.RunWorkerCompleted += delegate(object sender, RunWorkerCompletedEventArgs e)
-            {
-                if (e.Error == null)
-                    OnLoaded(e.Result as PersistableFile<T>, e.Error);
-                else
-                    OnLoaded(null, e.Error);
+            {   
+                OnLoaded(e.Result as PersistableFile<T>, e.Error);
             };
 
             worker.RunWorkerAsync();
@@ -118,7 +115,7 @@ namespace Konz.MyMovies.Core
             using (var myIsolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
             {
                 if (!myIsolatedStorage.FileExists(FileName))
-                    throw new System.IO.FileNotFoundException(string.Format("The file {0} was not found", FileName));
+                    return null;
 
                 using (var stream = myIsolatedStorage.OpenFile(FileName, System.IO.FileMode.Open))
                 {

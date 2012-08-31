@@ -58,7 +58,7 @@ namespace Konz.MyMovies.UI
 
         private void CitiesLoadedFromFile(PersistableFile<List<City>> file, Exception error)
         {
-            if (error == null)
+            if (file != null)
                 ShowData(file.Data);
             else
                 LoadCitiesFromInternet();

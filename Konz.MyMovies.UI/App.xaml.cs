@@ -57,7 +57,8 @@ namespace Konz.MyMovies.UI
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
-            LoadState();           
+            SettingsManager.CurrentDate = DateTime.Today;
+            LoadState();
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -73,6 +74,11 @@ namespace Konz.MyMovies.UI
             try
             {
                 AppState.Current = PersistableFile<AppState>.Load(Constants.AppStateFileName).Data;
+                if (AppState.Current.Date < DateTime.Today)
+                {
+                    AppState.Current = null;
+                    SettingsManager.CurrentDate = DateTime.Today;
+                }
             }
             catch (Exception)
             {
