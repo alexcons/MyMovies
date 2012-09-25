@@ -23,13 +23,13 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="auto"/>    
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Image Name="imgPoster" HorizontalAlignment="Left"/>
+                    <Image Grid.Row="0" Grid.Column="0" Name="imgPoster" HorizontalAlignment="Left"/>
                     <TextBlock Grid.Row="1" Name="txtSinopsis" TextWrapping="Wrap" Width="420" HorizontalAlignment="Left" />
                 </Grid>
             </controls:PanoramaItem>
@@ -48,8 +48,28 @@
                 </ListBox>
             </controls:PanoramaItem>
         </controls:Panorama>
-    </Grid>
+        <Button BorderThickness="0" Margin="0,123,50,0" Height="100" Name="btnShare" VerticalAlignment="Top" Click="btnShare_Click" HorizontalAlignment="Right" Width="100">
+            <Image Width="50" Height="50" Source="/Konz.MyMovies.UI;component/Images/FacebookIcon.png" HorizontalAlignment="Left" ></Image>
+        </Button>
+        <Button BorderThickness="0" Margin="0,123,120,0" Height="100" Name="btnTrailer" VerticalAlignment="Top" Click="btnTrailer_Click" HorizontalAlignment="Right" Width="100">
+            <Image Width="50" Height="50" Source="/Konz.MyMovies.UI;component/Images/video.png" HorizontalAlignment="Left" ></Image>
+        </Button>
+        <!--Panorama-based applications should not show an ApplicationBar-->
 
-    <!--Panorama-based applications should not show an ApplicationBar-->
+        <Popup x:Name="popFacebookShare" Margin="50,50,0,0" VerticalAlignment="Top" Height="550" HorizontalAlignment="Left" Width="380">
+            <Grid Background="#FF1A69AC" Width="{Binding ElementName=popFacebookShare, Path=Width}"
+                      Height="{Binding ElementName=popFacebookShare, Path=Height}">
+                <Grid.RowDefinitions >
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Compartir en Facebook" Grid.Row="0" Margin="20,10,0,0"/>
+                <TextBox Grid.Row="1" Name="txtMessage" Text="" GotFocus="txtMessage_GotFocus" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" />
+                <Button Grid.Row="2" Content="Compartir" Height="72" Name="btnPostToSocial" VerticalAlignment="Bottom" Click="btnPostToSocial_Click" />
+            </Grid>
+        </Popup>
+
+    </Grid>
 
 </phone:PhoneApplicationPage>

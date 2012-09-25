@@ -99,6 +99,20 @@ namespace Konz.MyMovies.Model
         public string Actors { get; set; }
 
         public string Rating { get; set; }
+
+        public string MovieUri { get; set; }
+
+        public string CleanTitle
+        {
+            get
+            {
+                string t = Title;
+                string[] endings = new string[] {"3D", "Dig", "Esp", "Sub", "Dob", "IMAX", "4DX", "XE"};
+                foreach (var item in endings)
+                    t = t.Replace(" " + item, string.Empty);
+                return t;
+            }
+        }
     }
 }
 

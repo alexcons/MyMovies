@@ -15,6 +15,9 @@
         AnyTime,
         Loading,
         NoData,
-        NoMoreShows
+        NoMoreShows,
+        FacebookIntegration,
+        FacebookIntegrationTitle,
+        GetDefaultShareMessage
     }
 }

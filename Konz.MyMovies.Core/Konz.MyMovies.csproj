@@ -41,6 +41,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Facebook">
+      <HintPath>..\packages\Facebook.6.0.24\lib\sl4-windowsphone71\Facebook.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -53,6 +56,8 @@
     <Compile Include="Cinepolis\ShowtimeData.cs" />
     <Compile Include="Core\Constants.cs" />
     <Compile Include="Core\SettingsManager.cs" />
+    <Compile Include="Model\FacebookManager.cs" />
+    <Compile Include="Model\FacebookResult.cs" />
     <Compile Include="Model\ShowtimeScheadule.cs" />
     <Compile Include="Cinepolis\DataExtractor.cs" />
     <Compile Include="Core\Enums.cs" />
@@ -66,6 +71,9 @@
     <Compile Include="Model\TheaterRoom.cs" />
     <Compile Include="Model\Expiration.cs" />
     <Compile Include="Core\Utils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />

@@ -98,12 +98,12 @@ namespace Konz.MyMovies.Core
                     try
                     {
                         var serializer = new XmlSerializer(typeof(PersistableFile<T>));
-                        using (XmlWriter xmlWriter = XmlWriter.Create(stream, xmlWriterSettings))
-                            serializer.Serialize(xmlWriter, this);
+                        XmlWriter xmlWriter = XmlWriter.Create(stream, xmlWriterSettings);
+                        serializer.Serialize(xmlWriter, this);
                     }
-                    finally
+                    catch
                     {
-                        stream.Close();
+                        return;
                     }
                 }
             }
@@ -122,12 +122,12 @@ namespace Konz.MyMovies.Core
                     try
                     {
                         var serializer = new XmlSerializer(typeof(PersistableFile<T>));
-                        using (XmlReader xmlReader = XmlReader.Create(stream))
-                            result = serializer.Deserialize(xmlReader) as PersistableFile<T>;
+                        XmlReader xmlReader = XmlReader.Create(stream);
+                        result = serializer.Deserialize(xmlReader) as PersistableFile<T>;
                     }
-                    finally
+                    catch
                     {
-                        stream.Close();
+                        return null;
                     }
                 }
             }

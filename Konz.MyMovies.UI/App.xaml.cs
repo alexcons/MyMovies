@@ -6,6 +6,8 @@ using Microsoft.Phone.Shell;
 using Konz.MyMovies.Model;
 using Konz.MyMovies.Core;
 using System;
+using Facebook;
+using System.Threading;
 
 namespace Konz.MyMovies.UI
 {
@@ -79,6 +81,19 @@ namespace Konz.MyMovies.UI
                     AppState.Current = null;
                     SettingsManager.CurrentDate = DateTime.Today;
                 }
+
+                var fb = new FacebookManager(SettingsManager.FacebookToken);
+                var wb = new WebBrowser();
+                FacebookOAuthResult result = null;
+                wb.Navigated += (sender, e) =>
+                {
+                    result = FacebookManager.GetToken(e.Uri);
+                    if (result == null)
+                        SettingsManager.FacebookToken = null;
+                    else
+                        SettingsManager.FacebookToken = result.AccessToken;
+                };
+                wb.Navigate(FacebookManager.GetFacebookLoginUrl());
             }
             catch (Exception)
             {

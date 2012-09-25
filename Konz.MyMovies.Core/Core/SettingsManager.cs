@@ -78,6 +78,62 @@ namespace Konz.MyMovies.Core
                 return _settings[name];
             return null;
         }
+        
+        public static bool DoNotSuggestFacebookIntegration
+        {
+            get
+            {
+                var settingName = "nofacebooksuggestion";
+                var result = (bool?)GetSetting(settingName);
+                return result ?? false;
+            }
+            set
+            {
+                var settingName = "nofacebooksuggestion";
+                _settings[settingName] = value;
+            }
+        }
+        public static bool FacebookActive
+        {
+            get
+            {
+                var settingName = "facebookactive";
+                var result = (bool?)GetSetting(settingName);
+                return result ?? false;
+            }
+            set
+            {
+                var settingName = "facebookactive";
+                _settings[settingName] = value;
+            }
+        }
 
+        public static string FacebookToken
+        {
+            get
+            {
+                var settingName = "facebooktoken";
+                return (String)GetSetting(settingName);
+            }
+            set
+            {
+                var settingName = "facebooktoken";
+                _settings[settingName] = value;
+            }
+        }
+
+        public static string FacebookId
+        {
+            get
+            {
+                var settingName = "facebookid";
+                return (String)GetSetting(settingName);
+            }
+            set
+            {
+                var settingName = "facebookid";
+                _settings[settingName] = value;
+            }
+        }
     }
 }

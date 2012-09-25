@@ -8,11 +8,16 @@ using Konz.MyMovies.Model;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Konz.MyMovies.Core;
+using System.Windows;
 
 namespace Konz.MyMovies.UI
 {
     public partial class MovieDetail : PhoneApplicationPage
     {
+
+        private Movie _movie;
+        private string _defaultMessage = Utils.GetMessage(Info.GetDefaultShareMessage);
+
         #region Constructor
 
         public MovieDetail()
@@ -27,7 +32,7 @@ namespace Konz.MyMovies.UI
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             var movieCode = NavigationContext.QueryString["m"];
-            var movie = AppState.Current.City.Movies.Where(x => x.Code == movieCode).SingleOrDefault();
+            _movie = AppState.Current.City.Movies.Where(x => x.Code == movieCode).SingleOrDefault();
             
             var theaterList = new List<Theater>();
             foreach (var theater in AppState.Current.City.Theaters)
@@ -40,7 +45,7 @@ namespace Konz.MyMovies.UI
                     theaterList.Add(theater);
             }
 
-            ShowData(movie, theaterList);
+            ShowData(_movie, theaterList);
 
             base.OnNavigatedTo(e);
         }
@@ -58,7 +63,11 @@ namespace Konz.MyMovies.UI
 
         private void PhoneApplicationPage_OrientationChanged(object sender, OrientationChangedEventArgs e)
         {
+            var orientation = PageOrientation.Portrait;
             if (e.Orientation == PageOrientation.LandscapeRight || e.Orientation == PageOrientation.LandscapeLeft)
+                orientation = PageOrientation.Landscape;
+
+            if (orientation == PageOrientation.Landscape)
             {
                 txtSinopsis.SetValue(Grid.ColumnProperty, 1);
                 txtSinopsis.SetValue(Grid.RowProperty, 0);
@@ -68,6 +77,8 @@ namespace Konz.MyMovies.UI
                 txtSinopsis.SetValue(Grid.ColumnProperty, 0);
                 txtSinopsis.SetValue(Grid.RowProperty, 1);
             }
+
+            SetPopUpSize(popFacebookShare, orientation);
         }
 
         #endregion
@@ -82,5 +93,78 @@ namespace Konz.MyMovies.UI
             }
         }
 
+        private void btnShare_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (SettingsManager.FacebookActive)
+            {
+                txtMessage.Text = _defaultMessage;
+                popFacebookShare.IsOpen = true;
+            }
+            else
+                if (MessageBox.Show(Utils.GetMessage(Info.FacebookIntegration), Utils.GetMessage(Info.FacebookIntegrationTitle), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                    NavigationService.Navigate(new Uri("/FacebookLoginPage.xaml", UriKind.Relative));
+        }
+
+        private void PostToSocial(string message)
+        {
+            if (SettingsManager.FacebookActive)
+            {
+                var fb = new FacebookManager(SettingsManager.FacebookToken);
+                fb.OnComplete = (args =>
+                {
+                    if (args.Error == null)
+                    {
+                        Dispatcher.BeginInvoke(() => MessageBox.Show("Ya esta en tu muro!"));
+                    }
+                    else
+                    {
+                        Dispatcher.BeginInvoke(() => MessageBox.Show(args.Error.Message));
+                        SettingsManager.FacebookActive = false;
+                    }
+                });
+                fb.Share(_movie, message);
+            }
+        }
+
+        private void btnPostToSocial_Click(object sender, RoutedEventArgs e)
+        {
+            popFacebookShare.IsOpen = false;
+            PostToSocial(txtMessage.Text);
+        }
+
+        protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
+        {
+            if (popFacebookShare.IsOpen)
+            {
+                popFacebookShare.IsOpen = false;
+                e.Cancel = true;
+            }
+            else
+                base.OnBackKeyPress(e);
+        }
+
+        private void SetPopUpSize(System.Windows.Controls.Primitives.Popup popUp, PageOrientation orientation)
+        {
+            if (orientation == PageOrientation.Portrait)
+            {
+                popUp.Height = 506;
+                popUp.Width = 380;
+            }
+            else
+            {
+                popUp.Height = 320;
+                popUp.Width = 700;
+            }
+        }
+
+        private void txtMessage_GotFocus(object sender, RoutedEventArgs e)
+        {
+            txtMessage.SelectAll();
+        }
+
+        private void btnTrailer_Click(object sender, RoutedEventArgs e)
+        {
+            YouTubeManager.Search(_movie.CleanTitle);
+        }
     }
 }

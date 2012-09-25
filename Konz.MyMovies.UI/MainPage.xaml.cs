@@ -33,9 +33,17 @@ namespace Konz.MyMovies.UI
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            //while (NavigationService.CanGoBack)
-            //    NavigationService.RemoveBackEntry();
-            
+            if (!SettingsManager.FacebookActive && !SettingsManager.DoNotSuggestFacebookIntegration)
+            {
+                if (MessageBox.Show(Utils.GetMessage(Info.FacebookIntegration), Utils.GetMessage(Info.FacebookIntegrationTitle), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                    NavigationService.Navigate(new Uri("/FacebookLoginPage.xaml", UriKind.Relative));
+                else
+                    SettingsManager.DoNotSuggestFacebookIntegration = true;
+            }
+
+            if (NavigationService.BackStack.Count() > 0 && NavigationService.BackStack.First().Source.ToString() == "/FacebookLoginPage.xaml")
+                NavigationService.RemoveBackEntry();
+
             if (SettingsManager.City == null)
             {
                 NavigationService.Navigate(new Uri("/CitySelect.xaml", UriKind.Relative));
@@ -291,13 +299,17 @@ namespace Konz.MyMovies.UI
         private void MenuDateChange_Click(object sender, EventArgs e)
         {
             if (Utils.InternetIsAvailable())
+            {
+                popSelectTheater.IsOpen = false;
                 popSelectDate.IsOpen = true;
+            }
             else
                 MessageBox.Show(Utils.GetMessage(Error.NoInternetConnection));            
         }
 
         private void MenuTheaterChange_Click(object sender, EventArgs e)
         {
+            popSelectDate.IsOpen = false;
             if (AppState.Current != null && AppState.Current.City.Theaters.Count > 1)
                 popSelectTheater.IsOpen = true;
         }

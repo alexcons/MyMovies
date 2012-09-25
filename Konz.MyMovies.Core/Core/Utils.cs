@@ -61,6 +61,12 @@ namespace Konz.MyMovies.Core
                     return "No hay datos";
                 case Info.NoMoreShows:
                     return "En {0} no hay mas funciones :("; 
+                case Info.FacebookIntegration:
+                    return "¿Quisieras integrar tu experiencia con Facebook?";
+                case Info.FacebookIntegrationTitle:
+                    return "Integración con Facebook";
+                case Info.GetDefaultShareMessage:
+                    return "¡Quiero ver esta película hoy!";
                 default:
                     return "Info No identificado";
             }
